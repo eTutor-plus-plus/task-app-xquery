@@ -1,13 +1,13 @@
-package at.jku.dke.task_app.binary_search.services;
+package at.jku.dke.task_app.xquery.services;
 
 import at.jku.dke.etutor.task_app.dto.ModifyTaskDto;
 import at.jku.dke.etutor.task_app.dto.TaskModificationResponseDto;
 import at.jku.dke.etutor.task_app.services.BaseTaskInGroupService;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTask;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskGroupRepository;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskRepository;
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskDto;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskDto;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,41 +16,41 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Locale;
 
 /**
- * This class provides methods for managing {@link BinarySearchTask}s.
+ * This class provides methods for managing {@link XQueryTask}s.
  */
 @Service
-public class BinarySearchTaskService extends BaseTaskInGroupService<BinarySearchTask, BinarySearchTaskGroup, ModifyBinarySearchTaskDto> {
+public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQueryTaskGroup, ModifyXQueryTaskDto> {
 
     private final MessageSource messageSource;
 
     /**
-     * Creates a new instance of class {@link BinarySearchTaskService}.
+     * Creates a new instance of class {@link XQueryTaskService}.
      *
      * @param repository          The task repository.
      * @param taskGroupRepository The task group repository.
      * @param messageSource       The message source.
      */
-    public BinarySearchTaskService(BinarySearchTaskRepository repository, BinarySearchTaskGroupRepository taskGroupRepository, MessageSource messageSource) {
+    public XQueryTaskService(XQueryTaskRepository repository, XQueryTaskGroupRepository taskGroupRepository, MessageSource messageSource) {
         super(repository, taskGroupRepository);
         this.messageSource = messageSource;
     }
 
     @Override
-    protected BinarySearchTask createTask(long id, ModifyTaskDto<ModifyBinarySearchTaskDto> modifyTaskDto) {
-        if (!modifyTaskDto.taskType().equals("binary-search"))
+    protected XQueryTask createTask(long id, ModifyTaskDto<ModifyXQueryTaskDto> modifyTaskDto) {
+        if (!modifyTaskDto.taskType().equals("xquery"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task type.");
-        return new BinarySearchTask(modifyTaskDto.additionalData().solution());
+        return new XQueryTask(modifyTaskDto.additionalData().solution());
     }
 
     @Override
-    protected void updateTask(BinarySearchTask task, ModifyTaskDto<ModifyBinarySearchTaskDto> modifyTaskDto) {
-        if (!modifyTaskDto.taskType().equals("binary-search"))
+    protected void updateTask(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> modifyTaskDto) {
+        if (!modifyTaskDto.taskType().equals("xquery"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task type.");
         task.setSolution(modifyTaskDto.additionalData().solution());
     }
 
     @Override
-    protected TaskModificationResponseDto mapToReturnData(BinarySearchTask task, boolean create) {
+    protected TaskModificationResponseDto mapToReturnData(XQueryTask task, boolean create) {
         return new TaskModificationResponseDto(
             this.messageSource.getMessage("defaultTaskDescription", null, Locale.GERMAN),
             this.messageSource.getMessage("defaultTaskDescription", null, Locale.ENGLISH)

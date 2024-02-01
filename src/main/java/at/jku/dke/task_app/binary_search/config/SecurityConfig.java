@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search.config;
+package at.jku.dke.task_app.xquery.config;
 
 import at.jku.dke.etutor.task_app.config.BaseSecurityConfig;
 import org.springframework.context.annotation.Configuration;

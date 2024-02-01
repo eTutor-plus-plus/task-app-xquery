@@ -1,10 +1,10 @@
-package at.jku.dke.task_app.binary_search.evaluation;
+package at.jku.dke.task_app.xquery.evaluation;
 
 import at.jku.dke.etutor.task_app.dto.CriterionDto;
 import at.jku.dke.etutor.task_app.dto.GradingDto;
 import at.jku.dke.etutor.task_app.dto.SubmitSubmissionDto;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskRepository;
-import at.jku.dke.task_app.binary_search.dto.BinarySearchSubmissionDto;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
+import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ import java.util.Locale;
 public class EvaluationService {
     private static final Logger LOG = LoggerFactory.getLogger(EvaluationService.class);
 
-    private final BinarySearchTaskRepository taskRepository;
+    private final XQueryTaskRepository taskRepository;
     private final MessageSource messageSource;
 
     /**
@@ -33,7 +33,7 @@ public class EvaluationService {
      * @param taskRepository The task repository.
      * @param messageSource  The message source.
      */
-    public EvaluationService(BinarySearchTaskRepository taskRepository, MessageSource messageSource) {
+    public EvaluationService(XQueryTaskRepository taskRepository, MessageSource messageSource) {
         this.taskRepository = taskRepository;
         this.messageSource = messageSource;
     }
@@ -45,7 +45,7 @@ public class EvaluationService {
      * @return The evaluation result.
      */
     @Transactional
-    public GradingDto evaluate(SubmitSubmissionDto<BinarySearchSubmissionDto> submission) {
+    public GradingDto evaluate(SubmitSubmissionDto<XQuerySubmissionDto> submission) {
         // find task
         var task = this.taskRepository.findById(submission.taskId()).orElseThrow(() -> new EntityNotFoundException("Task " + submission.taskId() + " does not exist."));
 

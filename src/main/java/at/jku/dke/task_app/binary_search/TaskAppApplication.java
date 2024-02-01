@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search;
+package at.jku.dke.task_app.xquery;
 
 import at.jku.dke.etutor.task_app.AppHelper;
 import org.slf4j.Logger;

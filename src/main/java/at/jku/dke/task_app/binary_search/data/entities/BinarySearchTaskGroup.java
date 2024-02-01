@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search.data.entities;
+package at.jku.dke.task_app.xquery.data.entities;
 
 import at.jku.dke.etutor.task_app.data.entities.BaseTaskGroup;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
@@ -8,14 +8,14 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Represents a binary search task group.
+ * Represents a XQuery task group.
  * <p>
- * It is also possible to create tasks without task types. Tasks of type binary_search would not need a task group.
+ * It is also possible to create tasks without task types. Tasks of type xquery would not need a task group.
  * Here a task group is only used for demonstration purposes.
  */
 @Entity
 @Table(name = "task_group")
-public class BinarySearchTaskGroup extends BaseTaskGroup {
+public class XQueryTaskGroup extends BaseTaskGroup {
     @NotNull
     @Column(name = "min_number", nullable = false)
     private Integer minNumber;
@@ -25,44 +25,44 @@ public class BinarySearchTaskGroup extends BaseTaskGroup {
     private Integer maxNumber;
 
     /**
-     * Creates a new instance of class {@link BinarySearchTaskGroup}.
+     * Creates a new instance of class {@link XQueryTaskGroup}.
      */
-    public BinarySearchTaskGroup() {
+    public XQueryTaskGroup() {
     }
 
     /**
-     * Creates a new instance of class {@link BinarySearchTaskGroup}.
+     * Creates a new instance of class {@link XQueryTaskGroup}.
      *
      * @param minNumber The minimum number.
      * @param maxNumber The maximum number.
      */
-    public BinarySearchTaskGroup(Integer minNumber, Integer maxNumber) {
+    public XQueryTaskGroup(Integer minNumber, Integer maxNumber) {
         this.minNumber = minNumber;
         this.maxNumber = maxNumber;
     }
 
     /**
-     * Creates a new instance of class {@link BinarySearchTaskGroup}.
+     * Creates a new instance of class {@link XQueryTaskGroup}.
      *
      * @param status    The status.
      * @param minNumber The minimum number.
      * @param maxNumber The maximum number.
      */
-    public BinarySearchTaskGroup(TaskStatus status, Integer minNumber, Integer maxNumber) {
+    public XQueryTaskGroup(TaskStatus status, Integer minNumber, Integer maxNumber) {
         super(status);
         this.minNumber = minNumber;
         this.maxNumber = maxNumber;
     }
 
     /**
-     * Creates a new instance of class {@link BinarySearchTaskGroup}.
+     * Creates a new instance of class {@link XQueryTaskGroup}.
      *
      * @param id        The id.
      * @param status    The status.
      * @param minNumber The minimum number.
      * @param maxNumber The maximum number.
      */
-    public BinarySearchTaskGroup(Long id, TaskStatus status, Integer minNumber, Integer maxNumber) {
+    public XQueryTaskGroup(Long id, TaskStatus status, Integer minNumber, Integer maxNumber) {
         super(id, status);
         this.minNumber = minNumber;
         this.maxNumber = maxNumber;

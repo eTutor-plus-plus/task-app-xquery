@@ -1,6 +1,6 @@
-package at.jku.dke.task_app.binary_search.validation;
+package at.jku.dke.task_app.xquery.validation;
 
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskGroupDto;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -12,10 +12,10 @@ class ValidTaskGroupNumberValidatorTest {
     void isValidCorrectOrder() {
         // Arrange
         ValidTaskGroupNumberValidator validTaskGroupNumberValidator = new ValidTaskGroupNumberValidator();
-        ModifyBinarySearchTaskGroupDto modifyBinarySearchTaskGroupDto = new ModifyBinarySearchTaskGroupDto(1, 2);
+        ModifyXQueryTaskGroupDto modifyXQueryTaskGroupDto = new ModifyXQueryTaskGroupDto(1, 2);
 
         // Act
-        boolean result = validTaskGroupNumberValidator.isValid(modifyBinarySearchTaskGroupDto, null);
+        boolean result = validTaskGroupNumberValidator.isValid(modifyXQueryTaskGroupDto, null);
 
         // Assert
         assertTrue(result);
@@ -25,10 +25,10 @@ class ValidTaskGroupNumberValidatorTest {
     void isValidSameValue() {
         // Arrange
         ValidTaskGroupNumberValidator validTaskGroupNumberValidator = new ValidTaskGroupNumberValidator();
-        ModifyBinarySearchTaskGroupDto modifyBinarySearchTaskGroupDto = new ModifyBinarySearchTaskGroupDto(2, 2);
+        ModifyXQueryTaskGroupDto modifyXQueryTaskGroupDto = new ModifyXQueryTaskGroupDto(2, 2);
 
         // Act
-        boolean result = validTaskGroupNumberValidator.isValid(modifyBinarySearchTaskGroupDto, null);
+        boolean result = validTaskGroupNumberValidator.isValid(modifyXQueryTaskGroupDto, null);
 
         // Assert
         assertFalse(result);
@@ -38,10 +38,10 @@ class ValidTaskGroupNumberValidatorTest {
     void isValidIncorrectOrder() {
         // Arrange
         ValidTaskGroupNumberValidator validTaskGroupNumberValidator = new ValidTaskGroupNumberValidator();
-        ModifyBinarySearchTaskGroupDto modifyBinarySearchTaskGroupDto = new ModifyBinarySearchTaskGroupDto(2, 1);
+        ModifyXQueryTaskGroupDto modifyXQueryTaskGroupDto = new ModifyXQueryTaskGroupDto(2, 1);
 
         // Act
-        boolean result = validTaskGroupNumberValidator.isValid(modifyBinarySearchTaskGroupDto, null);
+        boolean result = validTaskGroupNumberValidator.isValid(modifyXQueryTaskGroupDto, null);
 
         // Assert
         assertFalse(result);

@@ -1,15 +1,15 @@
-package at.jku.dke.task_app.binary_search.controllers;
+package at.jku.dke.task_app.xquery.controllers;
 
 import at.jku.dke.etutor.task_app.auth.AuthConstants;
 import at.jku.dke.etutor.task_app.dto.ModifyTaskDto;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
-import at.jku.dke.task_app.binary_search.ClientSetupExtension;
-import at.jku.dke.task_app.binary_search.DatabaseSetupExtension;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTask;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskGroupRepository;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskRepository;
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskDto;
+import at.jku.dke.task_app.xquery.ClientSetupExtension;
+import at.jku.dke.task_app.xquery.DatabaseSetupExtension;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskDto;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,10 +32,10 @@ class TaskControllerTest {
     private int port;
 
     @Autowired
-    private BinarySearchTaskRepository repository;
+    private XQueryTaskRepository repository;
 
     @Autowired
-    private BinarySearchTaskGroupRepository groupRepository;
+    private XQueryTaskGroupRepository groupRepository;
 
     private long taskId;
     private long taskGroupId;
@@ -44,9 +44,9 @@ class TaskControllerTest {
     void initDb() {
         this.repository.deleteAll();
 
-        var group = this.groupRepository.save(new BinarySearchTaskGroup(1L, TaskStatus.APPROVED, 1, 10));
+        var group = this.groupRepository.save(new XQueryTaskGroup(1L, TaskStatus.APPROVED, 1, 10));
         this.taskGroupId = group.getId();
-        this.taskId = this.repository.save(new BinarySearchTask(1L, BigDecimal.TWO, TaskStatus.APPROVED, group, 5)).getId();
+        this.taskId = this.repository.save(new XQueryTask(1L, BigDecimal.TWO, TaskStatus.APPROVED, group, 5)).getId();
     }
 
     //#region --- GET ---
@@ -105,7 +105,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(6)))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto(6)))
             // WHEN
             .when()
             .post("/api/task/{id}", this.taskId + 2)
@@ -125,7 +125,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(6)))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "", TaskStatus.APPROVED, new ModifyXQueryTaskDto(6)))
             // WHEN
             .when()
             .post("/api/task/{id}", this.taskId + 2)
@@ -156,7 +156,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(6)))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto(6)))
             // WHEN
             .when()
             .post("/api/task/{id}", this.taskId + 2)
@@ -174,7 +174,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(9)))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto(9)))
             // WHEN
             .when()
             .put("/api/task/{id}", this.taskId)
@@ -193,7 +193,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(9)))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto(9)))
             // WHEN
             .when()
             .put("/api/task/{id}", this.taskId + 1)
@@ -209,7 +209,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "sql", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(9)))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "sql", TaskStatus.APPROVED, new ModifyXQueryTaskDto(9)))
             // WHEN
             .when()
             .put("/api/task/{id}", this.taskId)
@@ -240,7 +240,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(9)))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto(9)))
             // WHEN
             .when()
             .put("/api/task/{id}", this.taskId)
@@ -298,7 +298,7 @@ class TaskControllerTest {
     @Test
     void mapToDto() {
         // Arrange
-        var task = new BinarySearchTask(42);
+        var task = new XQueryTask(42);
 
         // Act
         var result = new TaskController(null).mapToDto(task);

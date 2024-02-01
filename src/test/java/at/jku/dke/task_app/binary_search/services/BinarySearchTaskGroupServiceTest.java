@@ -1,9 +1,9 @@
-package at.jku.dke.task_app.binary_search.services;
+package at.jku.dke.task_app.xquery.services;
 
 import at.jku.dke.etutor.task_app.dto.ModifyTaskGroupDto;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskGroupDto;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class BinarySearchTaskGroupServiceTest {
+class XQueryTaskGroupServiceTest {
 
     @Test
     void createTaskGroup() {
         // Arrange
-        ModifyTaskGroupDto<ModifyBinarySearchTaskGroupDto> dto = new ModifyTaskGroupDto<>("binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 2));
-        BinarySearchTaskGroupService service = new BinarySearchTaskGroupService(null, null);
+        ModifyTaskGroupDto<ModifyXQueryTaskGroupDto> dto = new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 2));
+        XQueryTaskGroupService service = new XQueryTaskGroupService(null, null);
 
         // Act
         var taskGroup = service.createTaskGroup(3, dto);
@@ -33,8 +33,8 @@ class BinarySearchTaskGroupServiceTest {
     @Test
     void createTaskGroupInvalidType() {
         // Arrange
-        ModifyTaskGroupDto<ModifyBinarySearchTaskGroupDto> dto = new ModifyTaskGroupDto<>("sql", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 2));
-        BinarySearchTaskGroupService service = new BinarySearchTaskGroupService(null, null);
+        ModifyTaskGroupDto<ModifyXQueryTaskGroupDto> dto = new ModifyTaskGroupDto<>("sql", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 2));
+        XQueryTaskGroupService service = new XQueryTaskGroupService(null, null);
 
         // Act & Assert
         assertThrows(ResponseStatusException.class, () -> service.createTaskGroup(3, dto));
@@ -43,9 +43,9 @@ class BinarySearchTaskGroupServiceTest {
     @Test
     void updateTaskGroup() {
         // Arrange
-        ModifyTaskGroupDto<ModifyBinarySearchTaskGroupDto> dto = new ModifyTaskGroupDto<>("binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 2));
-        BinarySearchTaskGroupService service = new BinarySearchTaskGroupService(null, null);
-        var taskGroup = new BinarySearchTaskGroup(3, 4);
+        ModifyTaskGroupDto<ModifyXQueryTaskGroupDto> dto = new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 2));
+        XQueryTaskGroupService service = new XQueryTaskGroupService(null, null);
+        var taskGroup = new XQueryTaskGroup(3, 4);
 
         // Act
         service.updateTaskGroup(taskGroup, dto);
@@ -58,9 +58,9 @@ class BinarySearchTaskGroupServiceTest {
     @Test
     void updateTaskGroupInvalidType() {
         // Arrange
-        ModifyTaskGroupDto<ModifyBinarySearchTaskGroupDto> dto = new ModifyTaskGroupDto<>("sql", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 2));
-        BinarySearchTaskGroupService service = new BinarySearchTaskGroupService(null, null);
-        var taskGroup = new BinarySearchTaskGroup(3, 4);
+        ModifyTaskGroupDto<ModifyXQueryTaskGroupDto> dto = new ModifyTaskGroupDto<>("sql", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 2));
+        XQueryTaskGroupService service = new XQueryTaskGroupService(null, null);
+        var taskGroup = new XQueryTaskGroup(3, 4);
 
         // Act & Assert
         assertThrows(ResponseStatusException.class, () -> service.updateTaskGroup(taskGroup, dto));
@@ -70,8 +70,8 @@ class BinarySearchTaskGroupServiceTest {
     void mapToReturnData() {
         // Arrange
         MessageSource ms = mock(MessageSource.class);
-        BinarySearchTaskGroupService service = new BinarySearchTaskGroupService(null, ms);
-        var taskGroup = new BinarySearchTaskGroup(3, 4);
+        XQueryTaskGroupService service = new XQueryTaskGroupService(null, ms);
+        var taskGroup = new XQueryTaskGroup(3, 4);
 
         // Act
         var result = service.mapToReturnData(taskGroup, true);

@@ -1,13 +1,13 @@
-package at.jku.dke.task_app.binary_search.controllers;
+package at.jku.dke.task_app.xquery.controllers;
 
 import at.jku.dke.etutor.task_app.auth.AuthConstants;
 import at.jku.dke.etutor.task_app.dto.ModifyTaskGroupDto;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
-import at.jku.dke.task_app.binary_search.ClientSetupExtension;
-import at.jku.dke.task_app.binary_search.DatabaseSetupExtension;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskGroupRepository;
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskGroupDto;
+import at.jku.dke.task_app.xquery.ClientSetupExtension;
+import at.jku.dke.task_app.xquery.DatabaseSetupExtension;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,14 +30,14 @@ class TaskGroupControllerTest {
     private int port;
 
     @Autowired
-    private BinarySearchTaskGroupRepository repository;
+    private XQueryTaskGroupRepository repository;
 
     private long taskGroupId;
 
     @BeforeEach
     void initDb() {
         this.repository.deleteAll();
-        this.taskGroupId = this.repository.save(new BinarySearchTaskGroup(1L, TaskStatus.APPROVED, 1, 5)).getId();
+        this.taskGroupId = this.repository.save(new XQueryTaskGroup(1L, TaskStatus.APPROVED, 1, 5)).getId();
     }
 
     //#region --- GET ---
@@ -97,7 +97,7 @@ class TaskGroupControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskGroupDto<>("binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 5)))
+            .body(new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 5)))
             // WHEN
             .when()
             .post("/api/taskGroup/{id}", this.taskGroupId + 2)
@@ -117,7 +117,7 @@ class TaskGroupControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskGroupDto<>("", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 5)))
+            .body(new ModifyTaskGroupDto<>("", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 5)))
             // WHEN
             .when()
             .post("/api/taskGroup/{id}", this.taskGroupId + 2)
@@ -148,7 +148,7 @@ class TaskGroupControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskGroupDto<>("binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 5)))
+            .body(new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 5)))
             // WHEN
             .when()
             .post("/api/taskGroup/{id}", this.taskGroupId + 2)
@@ -166,7 +166,7 @@ class TaskGroupControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskGroupDto<>("binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 10)))
+            .body(new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 10)))
             // WHEN
             .when()
             .put("/api/taskGroup/{id}", this.taskGroupId)
@@ -185,7 +185,7 @@ class TaskGroupControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskGroupDto<>("binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 10)))
+            .body(new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 10)))
             // WHEN
             .when()
             .put("/api/taskGroup/{id}", this.taskGroupId + 1)
@@ -201,7 +201,7 @@ class TaskGroupControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskGroupDto<>("sql", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 10)))
+            .body(new ModifyTaskGroupDto<>("sql", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 10)))
             // WHEN
             .when()
             .put("/api/taskGroup/{id}", this.taskGroupId)
@@ -232,7 +232,7 @@ class TaskGroupControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskGroupDto<>("binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskGroupDto(1, 10)))
+            .body(new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto(1, 10)))
             // WHEN
             .when()
             .put("/api/taskGroup/{id}", this.taskGroupId)
@@ -342,7 +342,7 @@ class TaskGroupControllerTest {
     @Test
     void mapToDto() {
         // Arrange
-        var taskGroup = new BinarySearchTaskGroup(1, 5);
+        var taskGroup = new XQueryTaskGroup(1, 5);
 
         // Act
         var result = new TaskGroupController(null).mapToDto(taskGroup);

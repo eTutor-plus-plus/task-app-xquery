@@ -1,13 +1,13 @@
-package at.jku.dke.task_app.binary_search.validation;
+package at.jku.dke.task_app.xquery.validation;
 
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskGroupDto;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 /**
- * Custom validator for numbers in {@link ModifyBinarySearchTaskGroupDto}.
+ * Custom validator for numbers in {@link ModifyXQueryTaskGroupDto}.
  */
-public class ValidTaskGroupNumberValidator implements ConstraintValidator<ValidTaskGroupNumber, ModifyBinarySearchTaskGroupDto> {
+public class ValidTaskGroupNumberValidator implements ConstraintValidator<ValidTaskGroupNumber, ModifyXQueryTaskGroupDto> {
     /**
      * Creates a new instance of class Valid task group number validator.
      */
@@ -15,7 +15,7 @@ public class ValidTaskGroupNumberValidator implements ConstraintValidator<ValidT
     }
 
     @Override
-    public boolean isValid(ModifyBinarySearchTaskGroupDto value, ConstraintValidatorContext context) {
+    public boolean isValid(ModifyXQueryTaskGroupDto value, ConstraintValidatorContext context) {
         return value.minNumber() < value.maxNumber();
     }
 }

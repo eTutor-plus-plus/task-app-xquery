@@ -1,10 +1,10 @@
-package at.jku.dke.task_app.binary_search.data.entities;
+package at.jku.dke.task_app.xquery.data.entities;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BinarySearchSubmissionTest {
+class XQuerySubmissionTest {
 
     @Test
     void testConstructor() {
@@ -12,7 +12,7 @@ class BinarySearchSubmissionTest {
         var expected = "test";
 
         // Act
-        var submission = new BinarySearchSubmission(expected);
+        var submission = new XQuerySubmission(expected);
         var actual = submission.getSubmission();
 
         // Assert
@@ -22,7 +22,7 @@ class BinarySearchSubmissionTest {
     @Test
     void testGetSetSubmission() {
         // Arrange
-        var submission = new BinarySearchSubmission();
+        var submission = new XQuerySubmission();
         var expected = "test";
 
         // Act

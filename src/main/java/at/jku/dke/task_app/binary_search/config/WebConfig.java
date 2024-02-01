@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search.config;
+package at.jku.dke.task_app.xquery.config;
 
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository;

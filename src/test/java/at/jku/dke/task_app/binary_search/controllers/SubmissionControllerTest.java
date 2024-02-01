@@ -1,19 +1,19 @@
-package at.jku.dke.task_app.binary_search.controllers;
+package at.jku.dke.task_app.xquery.controllers;
 
 import at.jku.dke.etutor.task_app.auth.AuthConstants;
 import at.jku.dke.etutor.task_app.dto.GradingDto;
 import at.jku.dke.etutor.task_app.dto.SubmissionMode;
 import at.jku.dke.etutor.task_app.dto.SubmitSubmissionDto;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
-import at.jku.dke.task_app.binary_search.ClientSetupExtension;
-import at.jku.dke.task_app.binary_search.DatabaseSetupExtension;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchSubmission;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTask;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchSubmissionRepository;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskGroupRepository;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskRepository;
-import at.jku.dke.task_app.binary_search.dto.BinarySearchSubmissionDto;
+import at.jku.dke.task_app.xquery.ClientSetupExtension;
+import at.jku.dke.task_app.xquery.DatabaseSetupExtension;
+import at.jku.dke.task_app.xquery.data.entities.XQuerySubmission;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
+import at.jku.dke.task_app.xquery.data.repositories.XQuerySubmissionRepository;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
+import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,13 +41,13 @@ class SubmissionControllerTest {
     private int port;
 
     @Autowired
-    private BinarySearchTaskRepository repository;
+    private XQueryTaskRepository repository;
 
     @Autowired
-    private BinarySearchTaskGroupRepository groupRepository;
+    private XQueryTaskGroupRepository groupRepository;
 
     @Autowired
-    private BinarySearchSubmissionRepository submissionRepository;
+    private XQuerySubmissionRepository submissionRepository;
 
     private long taskId;
     private UUID ungraded;
@@ -57,14 +57,14 @@ class SubmissionControllerTest {
     void initDb() {
         this.repository.deleteAll();
 
-        var group = this.groupRepository.save(new BinarySearchTaskGroup(1L, TaskStatus.APPROVED, 1, 10));
-        var task = this.repository.save(new BinarySearchTask(1L, BigDecimal.TWO, TaskStatus.APPROVED, group, 5));
+        var group = this.groupRepository.save(new XQueryTaskGroup(1L, TaskStatus.APPROVED, 1, 10));
+        var task = this.repository.save(new XQueryTask(1L, BigDecimal.TWO, TaskStatus.APPROVED, group, 5));
         this.taskId = task.getId();
 
-        var submission = new BinarySearchSubmission("test-user", "test-id", task, "de", 3, SubmissionMode.SUBMIT, "5");
+        var submission = new XQuerySubmission("test-user", "test-id", task, "de", 3, SubmissionMode.SUBMIT, "5");
         submission.setEvaluationResult(new GradingDto(BigDecimal.TWO, BigDecimal.TWO, "success", new ArrayList<>()));
         this.graded = this.submissionRepository.save(submission).getId();
-        this.ungraded = this.submissionRepository.save(new BinarySearchSubmission("test-user", "test-id", task, "de", 3, SubmissionMode.SUBMIT, "5")).getId();
+        this.ungraded = this.submissionRepository.save(new XQuerySubmission("test-user", "test-id", task, "de", 3, SubmissionMode.SUBMIT, "5")).getId();
     }
 
     //#region --- SUBMIT ---
@@ -74,7 +74,7 @@ class SubmissionControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("2")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("2")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -98,7 +98,7 @@ class SubmissionControllerTest {
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .queryParams("persist", false)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -121,7 +121,7 @@ class SubmissionControllerTest {
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
             .queryParams("runInBackground", true)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -141,7 +141,7 @@ class SubmissionControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "it", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "it", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -156,7 +156,7 @@ class SubmissionControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId + 1, "de", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId + 1, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -172,7 +172,7 @@ class SubmissionControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -190,7 +190,7 @@ class SubmissionControllerTest {
                     .port(port)
                     .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
                     .contentType(ContentType.JSON)
-                    .body(new SubmitSubmissionDto<>("test-user-" + i, "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("5")))
+                    .body(new SubmitSubmissionDto<>("test-user-" + i, "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
                     // WHEN
                     .when()
                     .post("/api/submission")

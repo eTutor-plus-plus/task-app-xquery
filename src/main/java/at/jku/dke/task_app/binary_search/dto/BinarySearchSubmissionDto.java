@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search.dto;
+package at.jku.dke.task_app.xquery.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,5 +8,5 @@ import jakarta.validation.constraints.Size;
  *
  * @param input The user input.
  */
-public record BinarySearchSubmissionDto(@NotNull @Size(max = 255) String input) {
+public record XQuerySubmissionDto(@NotNull @Size(max = 255) String input) {
 }

@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search;
+package at.jku.dke.task_app.xquery;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.images.builder.Transferable;
@@ -19,10 +19,10 @@ class AppPostgresContainer extends PostgreSQLContainer<AppPostgresContainer> {
     public static final DockerImageName IMAGE_NAME = DockerImageName.parse(IMAGE_VERSION);
 
     public static final String DATABASE_NAME = "test_db";
-    public static final String USERNAME = "etutor_binary_search_test_admin";
+    public static final String USERNAME = "etutor_xquery_test_admin";
     public static final String PASSWORD = "strong-password";
-    public static final String ETUTOR_USERNAME = "etutor_binary_search_test";
-    public static final String ETUTOR_PASSWORD = "etutor_binary_search_pwd";
+    public static final String ETUTOR_USERNAME = "etutor_xquery_test";
+    public static final String ETUTOR_PASSWORD = "etutor_xquery_pwd";
 
     /**
      * The singleton instance of the test database container.

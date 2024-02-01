@@ -1,12 +1,12 @@
-package at.jku.dke.task_app.binary_search.controllers;
+package at.jku.dke.task_app.xquery.controllers;
 
 import at.jku.dke.etutor.task_app.auth.AuthConstants;
 import at.jku.dke.etutor.task_app.controllers.BaseTaskGroupController;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
-import at.jku.dke.task_app.binary_search.dto.MinMaxDto;
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskGroupDto;
-import at.jku.dke.task_app.binary_search.dto.BinarySearchTaskGroupDto;
-import at.jku.dke.task_app.binary_search.services.BinarySearchTaskGroupService;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
+import at.jku.dke.task_app.xquery.dto.MinMaxDto;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
+import at.jku.dke.task_app.xquery.dto.XQueryTaskGroupDto;
+import at.jku.dke.task_app.xquery.services.XQueryTaskGroupService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,23 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Random;
 
 /**
- * Controller for managing {@link BinarySearchTaskGroup}s.
+ * Controller for managing {@link XQueryTaskGroup}s.
  */
 @RestController
-public class TaskGroupController extends BaseTaskGroupController<BinarySearchTaskGroup, BinarySearchTaskGroupDto, ModifyBinarySearchTaskGroupDto> {
+public class TaskGroupController extends BaseTaskGroupController<XQueryTaskGroup, XQueryTaskGroupDto, ModifyXQueryTaskGroupDto> {
 
     /**
      * Creates a new instance of class {@link TaskGroupController}.
      *
      * @param taskGroupService The task group service.
      */
-    public TaskGroupController(BinarySearchTaskGroupService taskGroupService) {
+    public TaskGroupController(XQueryTaskGroupService taskGroupService) {
         super(taskGroupService);
     }
 
     @Override
-    protected BinarySearchTaskGroupDto mapToDto(BinarySearchTaskGroup taskGroup) {
-        return new BinarySearchTaskGroupDto(taskGroup.getMinNumber(), taskGroup.getMaxNumber());
+    protected XQueryTaskGroupDto mapToDto(XQueryTaskGroup taskGroup) {
+        return new XQueryTaskGroupDto(taskGroup.getMinNumber(), taskGroup.getMaxNumber());
     }
 
     /**

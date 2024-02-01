@@ -1,12 +1,12 @@
-package at.jku.dke.task_app.binary_search.data.repositories;
+package at.jku.dke.task_app.xquery.data.repositories;
 
 import at.jku.dke.etutor.task_app.data.repositories.TaskGroupRepository;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 
 import java.util.Optional;
 
 /**
- * Repository for entity {@link BinarySearchTaskGroup}.
+ * Repository for entity {@link XQueryTaskGroup}.
  */
-public interface BinarySearchTaskGroupRepository extends TaskGroupRepository<BinarySearchTaskGroup> {
+public interface XQueryTaskGroupRepository extends TaskGroupRepository<XQueryTaskGroup> {
 }

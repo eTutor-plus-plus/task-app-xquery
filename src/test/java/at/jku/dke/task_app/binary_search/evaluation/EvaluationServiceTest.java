@@ -1,14 +1,14 @@
-package at.jku.dke.task_app.binary_search.evaluation;
+package at.jku.dke.task_app.xquery.evaluation;
 
 import at.jku.dke.etutor.task_app.dto.SubmissionMode;
 import at.jku.dke.etutor.task_app.dto.SubmitSubmissionDto;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
-import at.jku.dke.task_app.binary_search.DatabaseSetupExtension;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTask;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskGroupRepository;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskRepository;
-import at.jku.dke.task_app.binary_search.dto.BinarySearchSubmissionDto;
+import at.jku.dke.task_app.xquery.DatabaseSetupExtension;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
+import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +26,9 @@ class EvaluationServiceTest {
     @Autowired
     private EvaluationService evaluationService;
     @Autowired
-    private BinarySearchTaskGroupRepository taskGroupRepository;
+    private XQueryTaskGroupRepository taskGroupRepository;
     @Autowired
-    private BinarySearchTaskRepository taskRepository;
+    private XQueryTaskRepository taskRepository;
     private long taskId;
 
     @BeforeEach
@@ -36,16 +36,16 @@ class EvaluationServiceTest {
         taskRepository.deleteAll();
         taskGroupRepository.deleteAll();
 
-        var taskGroup = taskGroupRepository.save(new BinarySearchTaskGroup(1L, TaskStatus.APPROVED, 1, 10));
-        var task = taskRepository.save(new BinarySearchTask(1L, BigDecimal.TEN, TaskStatus.APPROVED, taskGroup, 20));
+        var taskGroup = taskGroupRepository.save(new XQueryTaskGroup(1L, TaskStatus.APPROVED, 1, 10));
+        var task = taskRepository.save(new XQueryTask(1L, BigDecimal.TEN, TaskStatus.APPROVED, taskGroup, 20));
         this.taskId = task.getId();
     }
 
     @Test
     void evaluateRun() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.RUN, 3, new BinarySearchSubmissionDto("20"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.RUN, 3, new XQuerySubmissionDto("20"));
 
         // Act
         var result = evaluationService.evaluate(dto);
@@ -62,8 +62,8 @@ class EvaluationServiceTest {
     @Test
     void evaluateSubmitValid() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("20"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("20"));
 
         // Act
         var result = evaluationService.evaluate(dto);
@@ -80,8 +80,8 @@ class EvaluationServiceTest {
     @Test
     void evaluateSubmitInvalidSyntax() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("20 jku"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("20 jku"));
 
         // Act
         var result = evaluationService.evaluate(dto);
@@ -98,8 +98,8 @@ class EvaluationServiceTest {
     @Test
     void evaluateSubmitTooSmall() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.SUBMIT, 3, new BinarySearchSubmissionDto("18"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("18"));
 
         // Act
         var result = evaluationService.evaluate(dto);
@@ -116,8 +116,8 @@ class EvaluationServiceTest {
     @Test
     void evaluateDiagnoseValid() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.DIAGNOSE, 3, new BinarySearchSubmissionDto("20"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto("20"));
 
         // Act
         var result = evaluationService.evaluate(dto);
@@ -135,8 +135,8 @@ class EvaluationServiceTest {
     @Test
     void evaluateDiagnoseInvalidSyntax() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.DIAGNOSE, 3, new BinarySearchSubmissionDto("20 test"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto("20 test"));
 
         // Act
         var result = evaluationService.evaluate(dto);
@@ -153,8 +153,8 @@ class EvaluationServiceTest {
     @Test
     void evaluateDiagnoseTooBig() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.DIAGNOSE, 3, new BinarySearchSubmissionDto("25"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto("25"));
 
         // Act
         var result = evaluationService.evaluate(dto);
@@ -172,8 +172,8 @@ class EvaluationServiceTest {
     @Test
     void evaluateDiagnoseTooSmall() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.DIAGNOSE, 3, new BinarySearchSubmissionDto("15"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto("15"));
 
         // Act
         var result = evaluationService.evaluate(dto);
@@ -192,8 +192,8 @@ class EvaluationServiceTest {
     @Test
     void evaluateDiagnoseNoFeedback() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
-            "en", SubmissionMode.DIAGNOSE, 0, new BinarySearchSubmissionDto("15"));
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-assignment", taskId,
+            "en", SubmissionMode.DIAGNOSE, 0, new XQuerySubmissionDto("15"));
 
         // Act
         var result = evaluationService.evaluate(dto);

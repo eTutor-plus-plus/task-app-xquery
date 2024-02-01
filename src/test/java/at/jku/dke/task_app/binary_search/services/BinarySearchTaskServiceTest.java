@@ -1,10 +1,10 @@
-package at.jku.dke.task_app.binary_search.services;
+package at.jku.dke.task_app.xquery.services;
 
 import at.jku.dke.etutor.task_app.dto.ModifyTaskDto;
 import at.jku.dke.etutor.task_app.dto.TaskModificationResponseDto;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTask;
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskDto;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,16 +16,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class BinarySearchTaskServiceTest {
+class XQueryTaskServiceTest {
 
     @Test
     void createTask() {
         // Arrange
-        ModifyTaskDto<ModifyBinarySearchTaskDto> dto = new ModifyTaskDto<>(7L, BigDecimal.TEN, "binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(33));
-        BinarySearchTaskService service = new BinarySearchTaskService(null, null, null);
+        ModifyTaskDto<ModifyXQueryTaskDto> dto = new ModifyTaskDto<>(7L, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto(33));
+        XQueryTaskService service = new XQueryTaskService(null, null, null);
 
         // Act
-        BinarySearchTask task = service.createTask(3, dto);
+        XQueryTask task = service.createTask(3, dto);
 
         // Assert
         assertEquals(dto.additionalData().solution(), task.getSolution());
@@ -34,8 +34,8 @@ class BinarySearchTaskServiceTest {
     @Test
     void createTaskInvalidType() {
         // Arrange
-        ModifyTaskDto<ModifyBinarySearchTaskDto> dto = new ModifyTaskDto<>(7L, BigDecimal.TEN, "sql", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(33));
-        BinarySearchTaskService service = new BinarySearchTaskService(null, null, null);
+        ModifyTaskDto<ModifyXQueryTaskDto> dto = new ModifyTaskDto<>(7L, BigDecimal.TEN, "sql", TaskStatus.APPROVED, new ModifyXQueryTaskDto(33));
+        XQueryTaskService service = new XQueryTaskService(null, null, null);
 
         // Act & Assert
         assertThrows(ResponseStatusException.class, () -> service.createTask(3, dto));
@@ -44,9 +44,9 @@ class BinarySearchTaskServiceTest {
     @Test
     void updateTask() {
         // Arrange
-        ModifyTaskDto<ModifyBinarySearchTaskDto> dto = new ModifyTaskDto<>(7L, BigDecimal.TEN, "binary-search", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(33));
-        BinarySearchTaskService service = new BinarySearchTaskService(null, null, null);
-        BinarySearchTask task = new BinarySearchTask(3);
+        ModifyTaskDto<ModifyXQueryTaskDto> dto = new ModifyTaskDto<>(7L, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto(33));
+        XQueryTaskService service = new XQueryTaskService(null, null, null);
+        XQueryTask task = new XQueryTask(3);
 
         // Act
         service.updateTask(task, dto);
@@ -58,9 +58,9 @@ class BinarySearchTaskServiceTest {
     @Test
     void updateTaskInvalidType() {
         // Arrange
-        ModifyTaskDto<ModifyBinarySearchTaskDto> dto = new ModifyTaskDto<>(7L, BigDecimal.TEN, "sql", TaskStatus.APPROVED, new ModifyBinarySearchTaskDto(33));
-        BinarySearchTaskService service = new BinarySearchTaskService(null, null, null);
-        BinarySearchTask task = new BinarySearchTask(3);
+        ModifyTaskDto<ModifyXQueryTaskDto> dto = new ModifyTaskDto<>(7L, BigDecimal.TEN, "sql", TaskStatus.APPROVED, new ModifyXQueryTaskDto(33));
+        XQueryTaskService service = new XQueryTaskService(null, null, null);
+        XQueryTask task = new XQueryTask(3);
 
         // Act & Assert
         assertThrows(ResponseStatusException.class, () -> service.updateTask(task, dto));
@@ -70,8 +70,8 @@ class BinarySearchTaskServiceTest {
     void mapToReturnData() {
         // Arrange
         MessageSource ms = mock(MessageSource.class);
-        BinarySearchTaskService service = new BinarySearchTaskService(null, null, ms);
-        BinarySearchTask task = new BinarySearchTask(3);
+        XQueryTaskService service = new XQueryTaskService(null, null, ms);
+        XQueryTask task = new XQueryTask(3);
         task.setSolution(33);
 
         // Act

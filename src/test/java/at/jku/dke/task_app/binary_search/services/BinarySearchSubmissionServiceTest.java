@@ -1,26 +1,26 @@
-package at.jku.dke.task_app.binary_search.services;
+package at.jku.dke.task_app.xquery.services;
 
 import at.jku.dke.etutor.task_app.dto.SubmissionMode;
 import at.jku.dke.etutor.task_app.dto.SubmitSubmissionDto;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchSubmission;
-import at.jku.dke.task_app.binary_search.dto.BinarySearchSubmissionDto;
-import at.jku.dke.task_app.binary_search.evaluation.EvaluationService;
+import at.jku.dke.task_app.xquery.data.entities.XQuerySubmission;
+import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
+import at.jku.dke.task_app.xquery.evaluation.EvaluationService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class BinarySearchSubmissionServiceTest {
+class XQuerySubmissionServiceTest {
 
     @Test
     void createSubmissionEntity() {
         // Arrange
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 3L, "de", SubmissionMode.SUBMIT, 2, new BinarySearchSubmissionDto("33"));
-        BinarySearchSubmissionService service = new BinarySearchSubmissionService(null, null, null);
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 3L, "de", SubmissionMode.SUBMIT, 2, new XQuerySubmissionDto("33"));
+        XQuerySubmissionService service = new XQuerySubmissionService(null, null, null);
 
         // Act
-        BinarySearchSubmission submission = service.createSubmissionEntity(dto);
+        XQuerySubmission submission = service.createSubmissionEntity(dto);
 
         // Assert
         assertEquals(dto.submission().input(), submission.getSubmission());
@@ -29,11 +29,11 @@ class BinarySearchSubmissionServiceTest {
     @Test
     void mapSubmissionToSubmissionData() {
         // Arrange
-        BinarySearchSubmission submission = new BinarySearchSubmission("33");
-        BinarySearchSubmissionService service = new BinarySearchSubmissionService(null, null, null);
+        XQuerySubmission submission = new XQuerySubmission("33");
+        XQuerySubmissionService service = new XQuerySubmissionService(null, null, null);
 
         // Act
-        BinarySearchSubmissionDto dto = service.mapSubmissionToSubmissionData(submission);
+        XQuerySubmissionDto dto = service.mapSubmissionToSubmissionData(submission);
 
         // Assert
         assertEquals(submission.getSubmission(), dto.input());
@@ -43,8 +43,8 @@ class BinarySearchSubmissionServiceTest {
     void evaluate() {
         // Arrange
         var evalService = mock(EvaluationService.class);
-        SubmitSubmissionDto<BinarySearchSubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 3L, "de", SubmissionMode.SUBMIT, 2, new BinarySearchSubmissionDto("33"));
-        BinarySearchSubmissionService service = new BinarySearchSubmissionService(null, null, evalService);
+        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 3L, "de", SubmissionMode.SUBMIT, 2, new XQuerySubmissionDto("33"));
+        XQuerySubmissionService service = new XQuerySubmissionService(null, null, evalService);
 
         // Act
         var result = service.evaluate(dto);

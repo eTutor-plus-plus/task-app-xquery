@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search;
+package at.jku.dke.task_app.xquery;
 
 import at.jku.dke.etutor.task_app.auth.AuthConstants;
 import org.junit.jupiter.api.extension.BeforeAllCallback;

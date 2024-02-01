@@ -1,10 +1,10 @@
-package at.jku.dke.task_app.binary_search.data.repositories;
+package at.jku.dke.task_app.xquery.data.repositories;
 
 import at.jku.dke.etutor.task_app.data.repositories.SubmissionRepository;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchSubmission;
+import at.jku.dke.task_app.xquery.data.entities.XQuerySubmission;
 
 /**
- * Repository for entity {@link BinarySearchSubmission}.
+ * Repository for entity {@link XQuerySubmission}.
  */
-public interface BinarySearchSubmissionRepository extends SubmissionRepository<BinarySearchSubmission> {
+public interface XQuerySubmissionRepository extends SubmissionRepository<XQuerySubmission> {
 }

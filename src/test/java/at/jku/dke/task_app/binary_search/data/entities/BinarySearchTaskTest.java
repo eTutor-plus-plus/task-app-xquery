@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search.data.entities;
+package at.jku.dke.task_app.xquery.data.entities;
 
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BinarySearchTaskTest {
+class XQueryTaskTest {
 
     @Test
     void testConstructor1() {
@@ -15,7 +15,7 @@ class BinarySearchTaskTest {
         final int expected = 42;
 
         // Act
-        var task = new BinarySearchTask(expected);
+        var task = new XQueryTask(expected);
         int actual = task.getSolution();
 
         // Assert
@@ -28,15 +28,15 @@ class BinarySearchTaskTest {
         final int expected = 42;
         final BigDecimal maxPoints = BigDecimal.TEN;
         final TaskStatus status = TaskStatus.APPROVED;
-        final BinarySearchTaskGroup taskGroup = new BinarySearchTaskGroup();
+        final XQueryTaskGroup taskGroup = new XQueryTaskGroup();
         taskGroup.setId(55L);
 
         // Act
-        var task = new BinarySearchTask(maxPoints, status, taskGroup, expected);
+        var task = new XQueryTask(maxPoints, status, taskGroup, expected);
         int actualSolution = task.getSolution();
         BigDecimal actualMaxPoints = task.getMaxPoints();
         TaskStatus actualStatus = task.getStatus();
-        BinarySearchTaskGroup actualTaskGroup = task.getTaskGroup();
+        XQueryTaskGroup actualTaskGroup = task.getTaskGroup();
 
         // Assert
         assertEquals(expected, actualSolution);
@@ -51,17 +51,17 @@ class BinarySearchTaskTest {
         final int expected = 42;
         final BigDecimal maxPoints = BigDecimal.TEN;
         final TaskStatus status = TaskStatus.APPROVED;
-        final BinarySearchTaskGroup taskGroup = new BinarySearchTaskGroup();
+        final XQueryTaskGroup taskGroup = new XQueryTaskGroup();
         taskGroup.setId(55L);
         final long id = 1L;
 
         // Act
-        var task = new BinarySearchTask(id, maxPoints, status, taskGroup, expected);
+        var task = new XQueryTask(id, maxPoints, status, taskGroup, expected);
         long actualId = task.getId();
         int actualSolution = task.getSolution();
         BigDecimal actualMaxPoints = task.getMaxPoints();
         TaskStatus actualStatus = task.getStatus();
-        BinarySearchTaskGroup actualTaskGroup = task.getTaskGroup();
+        XQueryTaskGroup actualTaskGroup = task.getTaskGroup();
 
         // Assert
         assertEquals(id, actualId);
@@ -74,7 +74,7 @@ class BinarySearchTaskTest {
     @Test
     void testGetSetSolution() {
         // Arrange
-        var task = new BinarySearchTask();
+        var task = new XQueryTask();
         final int expected = 42;
 
         // Act

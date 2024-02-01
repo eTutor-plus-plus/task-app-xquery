@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search.validation;
+package at.jku.dke.task_app.xquery.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

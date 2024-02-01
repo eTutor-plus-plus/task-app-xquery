@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search.data.entities;
+package at.jku.dke.task_app.xquery.data.entities;
 
 import at.jku.dke.etutor.task_app.data.entities.BaseSubmission;
 import at.jku.dke.etutor.task_app.dto.SubmissionMode;
@@ -8,32 +8,32 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Represents a binary search input.
+ * Represents a XQuery input.
  */
 @Entity
 @Table(name = "submission")
-public class BinarySearchSubmission extends BaseSubmission<BinarySearchTask> {
+public class XQuerySubmission extends BaseSubmission<XQueryTask> {
     @NotNull
     @Column(name = "submission", nullable = false)
     private String submission;
 
     /**
-     * Creates a new instance of class {@link BinarySearchSubmission}.
+     * Creates a new instance of class {@link XQuerySubmission}.
      */
-    public BinarySearchSubmission() {
+    public XQuerySubmission() {
     }
 
     /**
-     * Creates a new instance of class {@link BinarySearchSubmission}.
+     * Creates a new instance of class {@link XQuerySubmission}.
      *
      * @param submission The input.
      */
-    public BinarySearchSubmission(String submission) {
+    public XQuerySubmission(String submission) {
         this.submission = submission;
     }
 
     /**
-     * Creates a new instance of class {@link BinarySearchSubmission}.
+     * Creates a new instance of class {@link XQuerySubmission}.
      *
      * @param userId        The user id.
      * @param assignmentId  The assignment id.
@@ -43,7 +43,7 @@ public class BinarySearchSubmission extends BaseSubmission<BinarySearchTask> {
      * @param mode          The mode.
      * @param submission    The input.
      */
-    public BinarySearchSubmission(String userId, String assignmentId, BinarySearchTask task, String language, int feedbackLevel, SubmissionMode mode, String submission) {
+    public XQuerySubmission(String userId, String assignmentId, XQueryTask task, String language, int feedbackLevel, SubmissionMode mode, String submission) {
         super(userId, assignmentId, task, language, feedbackLevel, mode);
         this.submission = submission;
     }

@@ -1,11 +1,11 @@
-package at.jku.dke.task_app.binary_search.services;
+package at.jku.dke.task_app.xquery.services;
 
 import at.jku.dke.etutor.task_app.dto.ModifyTaskGroupDto;
 import at.jku.dke.etutor.task_app.dto.TaskGroupModificationResponseDto;
 import at.jku.dke.etutor.task_app.services.BaseTaskGroupService;
-import at.jku.dke.task_app.binary_search.data.entities.BinarySearchTaskGroup;
-import at.jku.dke.task_app.binary_search.data.repositories.BinarySearchTaskGroupRepository;
-import at.jku.dke.task_app.binary_search.dto.ModifyBinarySearchTaskGroupDto;
+import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
+import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
+import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,41 +14,41 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Locale;
 
 /**
- * This class provides methods for managing {@link BinarySearchTaskGroup}s.
+ * This class provides methods for managing {@link XQueryTaskGroup}s.
  */
 @Service
-public class BinarySearchTaskGroupService extends BaseTaskGroupService<BinarySearchTaskGroup, ModifyBinarySearchTaskGroupDto> {
+public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup, ModifyXQueryTaskGroupDto> {
 
     private final MessageSource messageSource;
 
     /**
-     * Creates a new instance of class {@link BinarySearchTaskGroupService}.
+     * Creates a new instance of class {@link XQueryTaskGroupService}.
      *
      * @param repository    The task group repository.
      * @param messageSource The message source.
      */
-    public BinarySearchTaskGroupService(BinarySearchTaskGroupRepository repository, MessageSource messageSource) {
+    public XQueryTaskGroupService(XQueryTaskGroupRepository repository, MessageSource messageSource) {
         super(repository);
         this.messageSource = messageSource;
     }
 
     @Override
-    protected BinarySearchTaskGroup createTaskGroup(long id, ModifyTaskGroupDto<ModifyBinarySearchTaskGroupDto> modifyTaskGroupDto) {
-        if (!modifyTaskGroupDto.taskGroupType().equals("binary-search"))
+    protected XQueryTaskGroup createTaskGroup(long id, ModifyTaskGroupDto<ModifyXQueryTaskGroupDto> modifyTaskGroupDto) {
+        if (!modifyTaskGroupDto.taskGroupType().equals("xquery"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task group type.");
-        return new BinarySearchTaskGroup(modifyTaskGroupDto.additionalData().minNumber(), modifyTaskGroupDto.additionalData().maxNumber());
+        return new XQueryTaskGroup(modifyTaskGroupDto.additionalData().minNumber(), modifyTaskGroupDto.additionalData().maxNumber());
     }
 
     @Override
-    protected void updateTaskGroup(BinarySearchTaskGroup taskGroup, ModifyTaskGroupDto<ModifyBinarySearchTaskGroupDto> modifyTaskGroupDto) {
-        if (!modifyTaskGroupDto.taskGroupType().equals("binary-search"))
+    protected void updateTaskGroup(XQueryTaskGroup taskGroup, ModifyTaskGroupDto<ModifyXQueryTaskGroupDto> modifyTaskGroupDto) {
+        if (!modifyTaskGroupDto.taskGroupType().equals("xquery"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task group type.");
         taskGroup.setMinNumber(modifyTaskGroupDto.additionalData().minNumber());
         taskGroup.setMaxNumber(modifyTaskGroupDto.additionalData().maxNumber());
     }
 
     @Override
-    protected TaskGroupModificationResponseDto mapToReturnData(BinarySearchTaskGroup taskGroup, boolean create) {
+    protected TaskGroupModificationResponseDto mapToReturnData(XQueryTaskGroup taskGroup, boolean create) {
         return new TaskGroupModificationResponseDto(
             this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{taskGroup.getMinNumber(), taskGroup.getMaxNumber()}, Locale.GERMAN),
             this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{taskGroup.getMinNumber(), taskGroup.getMaxNumber()}, Locale.ENGLISH));

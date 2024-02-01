@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search;
+package at.jku.dke.task_app.xquery;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

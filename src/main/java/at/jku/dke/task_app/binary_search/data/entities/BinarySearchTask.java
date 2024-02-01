@@ -1,4 +1,4 @@
-package at.jku.dke.task_app.binary_search.data.entities;
+package at.jku.dke.task_app.xquery.data.entities;
 
 import at.jku.dke.etutor.task_app.data.entities.BaseTaskInGroup;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
@@ -10,45 +10,45 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
- * Represents a binary search task.
+ * Represents a XQuery task.
  */
 @Entity
 @Table(name = "task")
-public class BinarySearchTask extends BaseTaskInGroup<BinarySearchTaskGroup> {
+public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
     @NotNull
     @Column(name = "solution", nullable = false)
     private Integer solution;
 
     /**
-     * Creates a new instance of class {@link BinarySearchTask}.
+     * Creates a new instance of class {@link XQueryTask}.
      */
-    public BinarySearchTask() {
+    public XQueryTask() {
     }
 
     /**
-     * Creates a new instance of class {@link BinarySearchTask}.
+     * Creates a new instance of class {@link XQueryTask}.
      *
      * @param solution The solution.
      */
-    public BinarySearchTask(Integer solution) {
+    public XQueryTask(Integer solution) {
         this.solution = solution;
     }
 
     /**
-     * Creates a new instance of class {@link BinarySearchTask}.
+     * Creates a new instance of class {@link XQueryTask}.
      *
      * @param maxPoints The maximum points.
      * @param status    The status.
      * @param taskGroup The task group.
      * @param solution  The solution.
      */
-    public BinarySearchTask(BigDecimal maxPoints, TaskStatus status, BinarySearchTaskGroup taskGroup, Integer solution) {
+    public XQueryTask(BigDecimal maxPoints, TaskStatus status, XQueryTaskGroup taskGroup, Integer solution) {
         super(maxPoints, status, taskGroup);
         this.solution = solution;
     }
 
     /**
-     * Creates a new instance of class {@link BinarySearchTask}.
+     * Creates a new instance of class {@link XQueryTask}.
      *
      * @param id        The identifier.
      * @param maxPoints The maximum points.
@@ -56,7 +56,7 @@ public class BinarySearchTask extends BaseTaskInGroup<BinarySearchTaskGroup> {
      * @param taskGroup The task group.
      * @param solution  The solution.
      */
-    public BinarySearchTask(Long id, BigDecimal maxPoints, TaskStatus status, BinarySearchTaskGroup taskGroup, Integer solution) {
+    public XQueryTask(Long id, BigDecimal maxPoints, TaskStatus status, XQueryTaskGroup taskGroup, Integer solution) {
         super(id, maxPoints, status, taskGroup);
         this.solution = solution;
     }

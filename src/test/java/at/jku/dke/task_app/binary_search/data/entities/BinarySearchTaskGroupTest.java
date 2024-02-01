@@ -1,11 +1,11 @@
-package at.jku.dke.task_app.binary_search.data.entities;
+package at.jku.dke.task_app.xquery.data.entities;
 
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BinarySearchTaskGroupTest {
+class XQueryTaskGroupTest {
 
     @Test
     void testConstructor1() {
@@ -14,7 +14,7 @@ class BinarySearchTaskGroupTest {
         final int expectedMaxNumber = 42;
 
         // Act
-        BinarySearchTaskGroup binarySearchTaskGroup = new BinarySearchTaskGroup(expectedMinNumber, expectedMaxNumber);
+        XQueryTaskGroup binarySearchTaskGroup = new XQueryTaskGroup(expectedMinNumber, expectedMaxNumber);
         int actualMinNumber = binarySearchTaskGroup.getMinNumber();
         int actualMaxNumber = binarySearchTaskGroup.getMaxNumber();
 
@@ -31,7 +31,7 @@ class BinarySearchTaskGroupTest {
         final int expectedMaxNumber = 42;
 
         // Act
-        BinarySearchTaskGroup binarySearchTaskGroup = new BinarySearchTaskGroup(status, expectedMinNumber, expectedMaxNumber);
+        XQueryTaskGroup binarySearchTaskGroup = new XQueryTaskGroup(status, expectedMinNumber, expectedMaxNumber);
         TaskStatus actualStatus = binarySearchTaskGroup.getStatus();
         int actualMinNumber = binarySearchTaskGroup.getMinNumber();
         int actualMaxNumber = binarySearchTaskGroup.getMaxNumber();
@@ -51,7 +51,7 @@ class BinarySearchTaskGroupTest {
         final int expectedMaxNumber = 42;
 
         // Act
-        BinarySearchTaskGroup binarySearchTaskGroup = new BinarySearchTaskGroup(expectedId, status, expectedMinNumber, expectedMaxNumber);
+        XQueryTaskGroup binarySearchTaskGroup = new XQueryTaskGroup(expectedId, status, expectedMinNumber, expectedMaxNumber);
         long actualId = binarySearchTaskGroup.getId();
         TaskStatus actualStatus = binarySearchTaskGroup.getStatus();
         int actualMinNumber = binarySearchTaskGroup.getMinNumber();
@@ -67,7 +67,7 @@ class BinarySearchTaskGroupTest {
     @Test
     void testGetSetMinNumber() {
         // Arrange
-        BinarySearchTaskGroup binarySearchTaskGroup = new BinarySearchTaskGroup();
+        XQueryTaskGroup binarySearchTaskGroup = new XQueryTaskGroup();
         final int expected = 21;
 
         // Act
@@ -81,7 +81,7 @@ class BinarySearchTaskGroupTest {
     @Test
     void testGetSetMaxNumber() {
         // Arrange
-        BinarySearchTaskGroup binarySearchTaskGroup = new BinarySearchTaskGroup();
+        XQueryTaskGroup binarySearchTaskGroup = new XQueryTaskGroup();
         final int expected = 21;
 
         // Act
