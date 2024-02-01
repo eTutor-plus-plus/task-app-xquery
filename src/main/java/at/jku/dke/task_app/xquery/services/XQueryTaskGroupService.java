@@ -89,14 +89,14 @@ public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup
     @Override
     protected void afterDelete(long id) {
         LOG.info("Deleting XML files for task group with id {}.", id);
-        var path = Path.of(this.settings.xmlFilesDirectory(), id + "-diagnose.xml");
+        var path = XmlFileNameHelper.getDiagnoseFilePath(this.settings.xmlFilesDirectory(), id);
         try {
             Files.deleteIfExists(path);
         } catch (IOException ex) {
             LOG.error("Could not delete diagnose document from file system. " + path, ex);
         }
 
-        path = Path.of(this.settings.xmlFilesDirectory(), id + "-submit.xml");
+        path = XmlFileNameHelper.getSubmitFilePath(this.settings.xmlFilesDirectory(), id);
         try {
             Files.deleteIfExists(path);
         } catch (IOException ex) {
@@ -152,7 +152,7 @@ public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup
         }
 
         try {
-            var path = Path.of(directory.getAbsolutePath(), taskGroup.getId() + "-diagnose.xml");
+            var path = XmlFileNameHelper.getDiagnoseFilePath(directory.getAbsolutePath(), taskGroup.getId());
             LOG.info("Persisting diagnose document to file: {}", path);
             Files.writeString(path, taskGroup.getDiagnoseDocument(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException ex) {
@@ -161,7 +161,7 @@ public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup
         }
 
         try {
-            var path = Path.of(directory.getAbsolutePath(), taskGroup.getId() + "-submit.xml");
+            var path = XmlFileNameHelper.getSubmitFilePath(directory.getAbsolutePath(), taskGroup.getId());
             LOG.info("Persisting submit document to file: {}", path);
             Files.writeString(path, taskGroup.getSubmitDocument(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException ex) {
