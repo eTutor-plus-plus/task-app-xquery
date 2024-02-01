@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.HtmlUtils;
+import org.sqids.Sqids;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -104,9 +106,10 @@ public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup
 
     @Override
     protected TaskGroupModificationResponseDto mapToReturnData(XQueryTaskGroup taskGroup, boolean create) {
+        String id = Sqids.builder().minLength(4).build().encode(List.of(taskGroup.getId()));
         return new TaskGroupModificationResponseDto(
-            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument())}, Locale.GERMAN),
-            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument())}, Locale.ENGLISH));
+            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()), id}, Locale.GERMAN),
+            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()), id}, Locale.ENGLISH));
     }
 
     /**
