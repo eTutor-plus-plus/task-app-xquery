@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This class provides methods for managing {@link XQueryTask}s.
  */
@@ -32,7 +35,7 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
     protected XQueryTask createTask(long id, ModifyTaskDto<ModifyXQueryTaskDto> modifyTaskDto) {
         if (!modifyTaskDto.taskType().equals("xquery"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task type.");
-        return new XQueryTask(modifyTaskDto.additionalData().solution(), modifyTaskDto.additionalData().sorting());
+        return new XQueryTask(modifyTaskDto.additionalData().solution(), stringToList(modifyTaskDto.additionalData().sorting()));
     }
 
     @Override
@@ -40,7 +43,7 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
         if (!modifyTaskDto.taskType().equals("xquery"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task type.");
         task.setSolution(modifyTaskDto.additionalData().solution());
-        task.setSorting(modifyTaskDto.additionalData().sorting());
+        task.setSorting(stringToList(modifyTaskDto.additionalData().sorting()));
     }
 
     @Override
@@ -48,4 +51,7 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
         return new TaskModificationResponseDto(null, null);
     }
 
+    private static List<String> stringToList(String s) {
+        return Arrays.stream(s.split("\n")).map(String::strip).filter(x -> !x.isBlank()).toList();
+    }
 }

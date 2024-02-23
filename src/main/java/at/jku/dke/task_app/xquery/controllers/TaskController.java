@@ -2,8 +2,8 @@ package at.jku.dke.task_app.xquery.controllers;
 
 import at.jku.dke.etutor.task_app.controllers.BaseTaskController;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
-import at.jku.dke.task_app.xquery.dto.XQueryTaskDto;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskDto;
+import at.jku.dke.task_app.xquery.dto.XQueryTaskDto;
 import at.jku.dke.task_app.xquery.services.XQueryTaskService;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +24,7 @@ public class TaskController extends BaseTaskController<XQueryTask, XQueryTaskDto
 
     @Override
     protected XQueryTaskDto mapToDto(XQueryTask task) {
-        return new XQueryTaskDto(task.getSolution(), task.getSorting());
+        return new XQueryTaskDto(task.getSolution(), String.join("\n", task.getSorting()));
     }
 
 }

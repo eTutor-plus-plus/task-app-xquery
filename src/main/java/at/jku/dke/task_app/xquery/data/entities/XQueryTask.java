@@ -6,8 +6,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Represents a XQuery task.
@@ -19,8 +22,9 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
     @Column(name = "solution", nullable = false)
     private String solution;
 
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(name = "sorting")
-    private String sorting;
+    private List<String> sorting;
 
     /**
      * Creates a new instance of class {@link XQueryTask}.
@@ -32,9 +36,9 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
      * Creates a new instance of class {@link XQueryTask}.
      *
      * @param solution The solution.
-     * @param sorting  The sorting.
+     * @param sorting  The sorted nodes.
      */
-    public XQueryTask(String solution, String sorting) {
+    public XQueryTask(String solution, List<String> sorting) {
         this.solution = solution;
         this.sorting = sorting;
     }
@@ -46,9 +50,9 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
      * @param status    The status.
      * @param taskGroup The task group.
      * @param solution  The solution.
-     * @param sorting   The sorting.
+     * @param sorting   The sorted nodes.
      */
-    public XQueryTask(BigDecimal maxPoints, TaskStatus status, XQueryTaskGroup taskGroup, String solution, String sorting) {
+    public XQueryTask(BigDecimal maxPoints, TaskStatus status, XQueryTaskGroup taskGroup, String solution, List<String> sorting) {
         super(maxPoints, status, taskGroup);
         this.solution = solution;
         this.sorting = sorting;
@@ -64,7 +68,7 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
      * @param solution  The solution.
      * @param sorting   The sorting.
      */
-    public XQueryTask(Long id, BigDecimal maxPoints, TaskStatus status, XQueryTaskGroup taskGroup, String solution, String sorting) {
+    public XQueryTask(Long id, BigDecimal maxPoints, TaskStatus status, XQueryTaskGroup taskGroup, String solution, List<String> sorting) {
         super(id, maxPoints, status, taskGroup);
         this.solution = solution;
         this.sorting = sorting;
@@ -89,20 +93,22 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
     }
 
     /**
-     * Gets the sorting.
+     * Gets the XPath expressions which denotes XML nodes, which have to be in
+     * certain order in the submitted query.
      *
      * @return The sorting.
      */
-    public String getSorting() {
+    public List<String> getSorting() {
         return sorting;
     }
 
     /**
-     * Sets the sorting.
+     * Sets the XPath expressions which denotes XML nodes, which have to be in
+     * certain order in the submitted query.
      *
      * @param sorting The sorting.
      */
-    public void setSorting(String sorting) {
+    public void setSorting(List<String> sorting) {
         this.sorting = sorting;
     }
 }

@@ -2,6 +2,7 @@ package at.jku.dke.task_app.xquery.controllers;
 
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
+import at.jku.dke.task_app.xquery.services.HashIds;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.MediaType;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.sqids.Sqids;
 
 /**
  * Controller for managing {@link XQueryTaskGroup}s.
@@ -39,7 +39,7 @@ public class XmlController {
      */
     @GetMapping(value = "{id}", produces = MediaType.TEXT_XML_VALUE)
     public ResponseEntity<String> getDiagnoseDocument(@PathVariable String id) {
-        long taskGroupId = Sqids.builder().minLength(4).build().decode(id).getFirst();
+        long taskGroupId = HashIds.decode(id);
         XQueryTaskGroup taskGroup = this.taskGroupRepository.findById(taskGroupId).orElseThrow(() -> new EntityNotFoundException("XML Document not found"));
         return ResponseEntity.ok()
             .contentType(MediaType.TEXT_XML)

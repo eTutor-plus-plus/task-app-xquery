@@ -4,7 +4,9 @@ import at.jku.dke.etutor.task_app.dto.TaskStatus;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class XQueryTaskTest {
@@ -13,12 +15,12 @@ class XQueryTaskTest {
     void testConstructor1() {
         // Arrange
         final String solution = "//country/name";
-        final String sorting = "//path";
+        final List<String> sorting = List.of("//path");
 
         // Act
         var task = new XQueryTask(solution, sorting);
         String actualSolution = task.getSolution();
-        String actualSorting = task.getSorting();
+        List<String> actualSorting = task.getSorting();
 
         // Assert
         assertEquals(solution, actualSolution);
@@ -29,7 +31,7 @@ class XQueryTaskTest {
     void testConstructor2() {
         // Arrange
         final String solution = "//country/name";
-        final String sorting = "//path";
+        final List<String> sorting = List.of("//path");
         final BigDecimal maxPoints = BigDecimal.TEN;
         final TaskStatus status = TaskStatus.APPROVED;
         final XQueryTaskGroup taskGroup = new XQueryTaskGroup();
@@ -38,7 +40,7 @@ class XQueryTaskTest {
         // Act
         var task = new XQueryTask(maxPoints, status, taskGroup, solution, sorting);
         String actualSolution = task.getSolution();
-        String actualSorting = task.getSorting();
+        List<String> actualSorting = task.getSorting();
         BigDecimal actualMaxPoints = task.getMaxPoints();
         TaskStatus actualStatus = task.getStatus();
         XQueryTaskGroup actualTaskGroup = task.getTaskGroup();
@@ -55,7 +57,7 @@ class XQueryTaskTest {
     void testConstructor3() {
         // Arrange
         final String solution = "//country/name";
-        final String sorting = "//path";
+        final List<String> sorting = List.of("//path");
         final BigDecimal maxPoints = BigDecimal.TEN;
         final TaskStatus status = TaskStatus.APPROVED;
         final XQueryTaskGroup taskGroup = new XQueryTaskGroup();
@@ -66,7 +68,7 @@ class XQueryTaskTest {
         var task = new XQueryTask(id, maxPoints, status, taskGroup, solution, sorting);
         long actualId = task.getId();
         String actualSolution = task.getSolution();
-        String actualSorting = task.getSorting();
+        List<String> actualSorting = task.getSorting();
         BigDecimal actualMaxPoints = task.getMaxPoints();
         TaskStatus actualStatus = task.getStatus();
         XQueryTaskGroup actualTaskGroup = task.getTaskGroup();
@@ -98,11 +100,11 @@ class XQueryTaskTest {
     void testGetSetSorting() {
         // Arrange
         var task = new XQueryTask();
-        final String expected = "//path";
+        final List<String> expected = List.of("//path");
 
         // Act
         task.setSorting(expected);
-        final String actual = task.getSorting();
+        final List<String> actual = task.getSorting();
 
         // Assert
         assertEquals(expected, actual);

@@ -20,7 +20,7 @@ CREATE TABLE task
     status        TASK_STATUS   NOT NULL,
     task_group_id BIGINT        NOT NULL,
     solution      TEXT          NOT NULL,
-    sorting       TEXT,
+    sorting       VARCHAR(2000)[],
     CONSTRAINT task_pk PRIMARY KEY (id),
     CONSTRAINT task_task_group_fk FOREIGN KEY (task_group_id) REFERENCES task_group (id)
         ON DELETE CASCADE

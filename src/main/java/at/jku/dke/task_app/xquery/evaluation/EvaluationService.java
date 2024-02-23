@@ -2,21 +2,22 @@ package at.jku.dke.task_app.xquery.evaluation;
 
 import at.jku.dke.etutor.task_app.dto.CriterionDto;
 import at.jku.dke.etutor.task_app.dto.GradingDto;
+import at.jku.dke.etutor.task_app.dto.SubmissionMode;
 import at.jku.dke.etutor.task_app.dto.SubmitSubmissionDto;
 import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
 import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
-import at.jku.dke.task_app.xquery.services.XmlFileNameHelper;
+import at.jku.dke.task_app.xquery.evaluation.analysis.Analysis;
+import at.jku.dke.task_app.xquery.evaluation.execution.*;
 import jakarta.persistence.EntityNotFoundException;
-import net.sf.saxon.s9api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.HtmlUtils;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,6 @@ public class EvaluationService {
 
     private final XQuerySettings settings;
     private final XQueryTaskRepository taskRepository;
-    private final Processor processor;
-    private final XQueryCompiler compiler;
     private final MessageSource messageSource;
 
     /**
@@ -46,9 +45,6 @@ public class EvaluationService {
         this.settings = settings;
         this.taskRepository = taskRepository;
         this.messageSource = messageSource;
-        this.processor = new Processor(false);
-        this.compiler = this.processor.newXQueryCompiler();
-        this.compiler.setBaseURI(Path.of(this.settings.xmlFilesDirectory()).toAbsolutePath().toUri());
     }
 
     /**
@@ -56,70 +52,81 @@ public class EvaluationService {
      *
      * @param submission The input to evaluate.
      * @return The evaluation result.
+     * @throws EntityNotFoundException If the task does not exist.
+     * @throws RuntimeException        If an error occurs during evaluation.
+     * @throws IllegalStateException   If the executor is not supported.
      */
     @Transactional
     public GradingDto evaluate(SubmitSubmissionDto<XQuerySubmissionDto> submission) {
         // find task
-        var task = this.taskRepository.findById(submission.taskId()).orElseThrow(() -> new EntityNotFoundException("Task " + submission.taskId() + " does not exist."));
+        var task = this.taskRepository.findByIdWithTaskGroup(submission.taskId())
+            .orElseThrow(() -> new EntityNotFoundException("Task " + submission.taskId() + " does not exist."));
 
-        // evaluate input
+        // prepare
         LOG.info("Evaluating input for task {} with mode {} and feedback-level {}", submission.taskId(), submission.mode(), submission.feedbackLevel());
         Locale locale = Locale.of(submission.language());
         BigDecimal points = BigDecimal.ZERO;
         List<CriterionDto> criteria = new ArrayList<>();
-        String feedback = this.messageSource.getMessage("incorrect", null, locale);
-        String xmlFileName = switch (submission.mode()) {
-            case RUN, DIAGNOSE -> XmlFileNameHelper.getDiagnoseFileName(task.getTaskGroup().getId());
-            case SUBMIT -> XmlFileNameHelper.getSubmitFileName(task.getTaskGroup().getId());
+        String xmlDocument = switch (submission.mode()) {
+            case RUN, DIAGNOSE -> task.getTaskGroup().getDiagnoseDocument();
+            case SUBMIT -> task.getTaskGroup().getSubmitDocument();
+        };
+        XQProcessor processor = switch (this.settings.executor()) {
+            case "saxon" -> //noinspection resource
+                new SaxonProcessor(Path.of(this.settings.xmlDirectory()));
+            case "basex" -> //noinspection resource
+                new BaseXProcessor(Path.of(this.settings.xmlDirectory()));
+            default -> throw new IllegalStateException("Unexpected executor: " + this.settings.executor());
         };
 
-        // execute submission
-        String submissionResult = null;
-        try {
-            submissionResult = this.executeQuery(submission.submission().input().replaceAll("'etutor.xml'", String.format("'%s'", xmlFileName)));
-        } catch (SaxonApiException ex) {
-            LOG.warn("Error while executing query", ex);
-            criteria.add(new CriterionDto(
-                this.messageSource.getMessage("criterium.syntax", null, locale),
-                null,
-                false,
-                ex.getMessage()));
-        }
-        if (!criteria.isEmpty()) { // abort if submission contains syntax error
-            return new GradingDto(task.getMaxPoints(), BigDecimal.ZERO,
-                this.messageSource.getMessage("incorrect", null, locale), criteria);
-        }
+        // execute
+        String submissionResult;
+        String solutionResult;
+        try (processor) {
+            // execute submission
+            try {
+                submissionResult = "<xquery-result>" + processor.executeQuery(submission.submission().input(), xmlDocument) + "</xquery-result>";
+            } catch (InvalidDocumentLoadException ex) {
+                LOG.warn("Error while executing query because of invalid document load", ex);
+                criteria.add(new CriterionDto(
+                    this.messageSource.getMessage("criterium.syntax", null, locale),
+                    null,
+                    false,
+                    this.messageSource.getMessage("invalidDocument", null, locale)));
+                return new GradingDto(task.getMaxPoints(), points, this.messageSource.getMessage("syntaxError", null, locale), criteria);
+            } catch (XQueryException ex) {
+                LOG.warn("Error while executing query", ex);
+                criteria.add(new CriterionDto(
+                    this.messageSource.getMessage("criterium.syntax", null, locale),
+                    null,
+                    false,
+                    ex.getMessage()));
+                return new GradingDto(task.getMaxPoints(), points, this.messageSource.getMessage("syntaxError", null, locale), criteria);
+            }
 
-        // execute solution
-        String solutionResult = null;
-        try {
-            solutionResult = this.executeQuery(task.getSolution().replaceAll("'etutor.xml'", String.format("'%s'", xmlFileName)));
-        } catch (SaxonApiException ex) {
-            LOG.error("Error while executing query", ex);
+            // execute solution
+            if (submission.mode() == SubmissionMode.RUN) {
+                solutionResult = submissionResult;
+            } else {
+                try {
+                    solutionResult = "<xquery-result>" + processor.executeQuery(task.getSolution(), xmlDocument) + "</xquery-result>";
+                } catch (XQueryException ex) {
+                    LOG.error("Error while executing query", ex);
+                    throw new RuntimeException(ex);
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error("Could not close processor", ex);
             throw new RuntimeException(ex);
         }
 
-        // analyze
+        // analyze, grade, feedback
+        var analysis = new Analysis(submissionResult, solutionResult);
         criteria.add(new CriterionDto(
             "Ausgabe",
             null,
             false,
-            submissionResult));
-        return new GradingDto(task.getMaxPoints(), points, feedback, criteria);
-    }
-
-    /**
-     * Executes the specified query.
-     *
-     * @param query The query to execute.
-     * @return The result of the query.
-     * @throws SaxonApiException If the query compilation fails with a static error or the execution of the query fails with a dynamic error.
-     */
-    private String executeQuery(String query) throws SaxonApiException {
-        LOG.debug("Executing query: {}", query);
-        XQueryExecutable executable = this.compiler.compile(query);
-        XQueryEvaluator evaluator = executable.load();
-        XdmValue result = evaluator.evaluate();
-        return result.toString();
+            "<pre>" + HtmlUtils.htmlEscape(submissionResult) + "</pre>"));
+        return new GradingDto(task.getMaxPoints(), points, "", criteria);
     }
 }

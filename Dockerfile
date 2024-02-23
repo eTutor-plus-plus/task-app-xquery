@@ -18,19 +18,6 @@ COPY --from=builder /app/application/ ./
 
 # Spring
 ENV SPRING_PROFILES_ACTIVE=prod
-#ENV SERVER_PORT=8081
-
-## Database
-#ENV SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/etutor_xquery
-#ENV SPRING_DATASOURCE_USERNAME=etutor_xquery
-#ENV SPRING_DATASOURCE_PASSWORD=TBD
-#ENV SPRING_FLYWAY_USER=etutor_xquery_admin
-#ENV SPRING_FLYWAY_PASSWORD=TBD
-
-## Clients (just as example, add more when executing)
-#ENV CLIENTS_API_KEYS_0_NAME=task-administration
-#ENV CLIENTS_API_KEYS_0_KEY=TBD
-#ENV CLIENTS_API_KEYS_0_ROLES_0=CRUD
-#ENV CLIENTS_API_KEYS_0_ROLES_1=SUBMIT
+ENV XQUERY_XML_DIRECTORY=/tmp/basex
 
 ENTRYPOINT ["java", "-Xmx6g", "org.springframework.boot.loader.launch.JarLauncher"]

@@ -12,7 +12,7 @@
 
     <groupId>at.jku.dke.etutor</groupId>
     <artifactId>task-app-xquery</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.0</version>
 
     <name>eTutor Task-App: XQuery</name>
     <description>eTutor Task-App for task type "xquery"</description>
@@ -68,6 +68,16 @@
             <artifactId>Saxon-HE</artifactId>
             <version>12.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.pageseeder.diffx</groupId>
+            <artifactId>pso-diffx</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.basex</groupId>
+            <artifactId>basex</artifactId>
+            <version>10.7</version>
+        </dependency> <!-- TODO: remove unused dependencies -->
 
         <!-- Spring Dev -->
         <dependency>

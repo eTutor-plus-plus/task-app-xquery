@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -46,7 +47,7 @@ class TaskControllerTest {
 
         var group = this.groupRepository.save(new XQueryTaskGroup(1L, TaskStatus.APPROVED, "<db><solution>1</solution></db>", "<db><solution>2</solution></db>"));
         this.taskGroupId = group.getId();
-        this.taskId = this.repository.save(new XQueryTask(1L, BigDecimal.TWO, TaskStatus.APPROVED, group, "//solution", "//sorting")).getId();
+        this.taskId = this.repository.save(new XQueryTask(1L, BigDecimal.TWO, TaskStatus.APPROVED, group, "//solution", List.of("//sorting", "/node"))).getId();
     }
 
     //#region --- GET ---
@@ -65,7 +66,7 @@ class TaskControllerTest {
             .statusCode(200)
             .contentType(ContentType.JSON)
             .body("solution", equalTo("//solution"))
-            .body("sorting", equalTo("//sorting"));
+            .body("sorting", equalTo("//sorting\n/node"));
     }
 
     @Test
@@ -295,7 +296,7 @@ class TaskControllerTest {
     @Test
     void mapToDto() {
         // Arrange
-        var task = new XQueryTask("//newSolution", "//newSorting");
+        var task = new XQueryTask("//newSolution", List.of("//newSorting"));
 
         // Act
         var result = new TaskController(null).mapToDto(task);

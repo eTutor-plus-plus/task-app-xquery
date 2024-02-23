@@ -1,6 +1,7 @@
 package at.jku.dke.task_app.xquery;
 
 import at.jku.dke.etutor.task_app.AppHelper;
+import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -14,7 +15,7 @@ import org.springframework.core.env.Environment;
  * The main class of the application.
  */
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class, UserDetailsServiceAutoConfiguration.class})
-@ConfigurationPropertiesScan("at.jku.dke.task_app.xquery.config")
+@ConfigurationPropertiesScan(basePackageClasses = XQuerySettings.class)
 public class TaskAppApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskAppApplication.class);
