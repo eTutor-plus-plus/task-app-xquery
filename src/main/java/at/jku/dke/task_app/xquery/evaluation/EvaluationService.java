@@ -8,6 +8,7 @@ import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
 import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
 import at.jku.dke.task_app.xquery.evaluation.analysis.Analysis;
+import at.jku.dke.task_app.xquery.evaluation.analysis.XQResult;
 import at.jku.dke.task_app.xquery.evaluation.execution.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -85,7 +86,7 @@ public class EvaluationService {
         try (processor) {
             // execute submission
             try {
-                submissionResult = "<xquery-result>" + processor.executeQuery(submission.submission().input(), xmlDocument) + "</xquery-result>";
+                submissionResult = processor.executeQuery(submission.submission().input(), xmlDocument);
             } catch (InvalidDocumentLoadException ex) {
                 LOG.warn("Error while executing query because of invalid document load", ex);
                 criteria.add(new CriterionDto(
@@ -109,7 +110,7 @@ public class EvaluationService {
                 solutionResult = submissionResult;
             } else {
                 try {
-                    solutionResult = "<xquery-result>" + processor.executeQuery(task.getSolution(), xmlDocument) + "</xquery-result>";
+                    solutionResult = processor.executeQuery(task.getSolution(), xmlDocument);
                 } catch (XQueryException ex) {
                     LOG.error("Error while executing query", ex);
                     throw new RuntimeException(ex);
@@ -121,7 +122,7 @@ public class EvaluationService {
         }
 
         // analyze, grade, feedback
-        var analysis = new Analysis(submissionResult, solutionResult);
+        var analysis = new Analysis(new XQResult(submissionResult), new XQResult(solutionResult));
         criteria.add(new CriterionDto(
             "Ausgabe",
             null,

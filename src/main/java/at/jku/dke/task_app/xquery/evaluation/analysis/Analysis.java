@@ -26,8 +26,8 @@ import java.util.Objects;
 public class Analysis {
     private static final Logger LOG = LoggerFactory.getLogger(EvaluationService.class);
 
-    private final String submissionResult;
-    private final String solutionResult;
+    private final XQResult submissionResult;
+    private final XQResult solutionResult;
 
     private List<Object> missingNodes; // im Ergebnis der Musterlösung enthalten, aber im Ergebnis der Abgabe nicht enthalten
     private List<Object> superfluousNodes; // umgekehrter fall von missingNodes
@@ -54,7 +54,7 @@ public class Analysis {
      * @param submissionResult The result of the submission.
      * @param solutionResult   The result of the solution.
      */
-    public Analysis(String submissionResult, String solutionResult) {
+    public Analysis(XQResult submissionResult, XQResult solutionResult) {
         Objects.requireNonNull(submissionResult);
         Objects.requireNonNull(solutionResult);
 
@@ -78,8 +78,8 @@ public class Analysis {
      * @throws RuntimeException If the diff could not be generated.
      */
     private String generateDiff() {
-        try (var submissionReader = new StringReader(this.submissionResult);
-             var solutionReader = new StringReader(this.solutionResult);
+        try (var submissionReader = new StringReader(this.submissionResult.getRawResult());
+             var solutionReader = new StringReader(this.solutionResult.getRawResult());
              var writer = new StringWriter()) {
             Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.IGNORE, TextGranularity.TEXT));
 
