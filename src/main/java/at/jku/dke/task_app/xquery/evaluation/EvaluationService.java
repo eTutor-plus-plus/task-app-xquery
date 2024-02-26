@@ -8,6 +8,7 @@ import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
 import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
 import at.jku.dke.task_app.xquery.evaluation.analysis.Analysis;
+import at.jku.dke.task_app.xquery.evaluation.analysis.AnalysisException;
 import at.jku.dke.task_app.xquery.evaluation.analysis.XQResult;
 import at.jku.dke.task_app.xquery.evaluation.execution.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -122,7 +123,11 @@ public class EvaluationService {
         }
 
         // analyze, grade, feedback
-        var analysis = new Analysis(new XQResult(submissionResult), new XQResult(solutionResult));
+        try {
+            var analysis = new Analysis(new XQResult(submissionResult), new XQResult(solutionResult));
+        } catch (AnalysisException e) {
+            throw new RuntimeException(e);
+        }
         criteria.add(new CriterionDto(
             "Ausgabe",
             null,

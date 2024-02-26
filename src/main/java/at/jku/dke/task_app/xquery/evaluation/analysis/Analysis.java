@@ -9,16 +9,29 @@ import org.pageseeder.diffx.config.TextGranularity;
 import org.pageseeder.diffx.config.WhiteSpaceProcessing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Analyzes and prepares the evaluation of a submission.
@@ -29,74 +42,306 @@ public class Analysis {
     private final XQResult submissionResult;
     private final XQResult solutionResult;
 
-    private List<Object> missingNodes; // im Ergebnis der Musterlösung enthalten, aber im Ergebnis der Abgabe nicht enthalten
-    private List<Object> superfluousNodes; // umgekehrter fall von missingNodes
-    private List<Object> displacedNodes; // die zwar auf einer bestimmten Hierarchiestufe in der XML-Struktur korrekt vorhanden sind, allerdings nicht an der erwarteten Position
-    private List<Object> missingAttributes; // fehlende Attribute
-    private List<Object> superfluousAttributes; // überflüssige Attribute
-    private List<Object> incorrectAttributeValues; // falsche Attributwerte
-
-    /*private List<Object> redundantNodes;
-    private List<Object> redundantInsteadNodes;
-    private List<Object> displacedNodes;
-    private List<Object> missingInsteadNodes;
-    private List<Object> missingPreviousNodes;
-    private List<Object> missingNextNodes;
-    private List<Object> missingInnerNodes;
-    private List<Object> redundantAttributes;
-    private List<Object> incorrectAttributeValues;
-    private List<Object> missingAttributes;
-    private List<Object> incorrectTextValues;*/
+    private boolean schemaValid;
+    private List<Element> missingNodes;
+    private List<Element> superfluousNodes;
+    private List<Element> displacedNodes;
+    private List<Element> missingAttributes; // fehlende Attribute
+    private List<Element> superfluousAttributes; // überflüssige Attribute
+    private List<Element> incorrectAttributeValues; // falsche Attributwerte
+    private List<Element> incorrectTextValues; // falsche Elementwerte
 
     /**
      * Creates a new instance of class {@link Analysis} and analyzes the results.
      *
      * @param submissionResult The result of the submission.
      * @param solutionResult   The result of the solution.
+     * @throws NullPointerException If {@code submissionResult} or {@code solutionResult} is {@code null}.
+     * @throws AnalysisException    If an error occurs during analysis.
      */
-    public Analysis(XQResult submissionResult, XQResult solutionResult) {
+    public Analysis(XQResult submissionResult, XQResult solutionResult) throws AnalysisException {
         Objects.requireNonNull(submissionResult);
         Objects.requireNonNull(solutionResult);
 
         this.submissionResult = submissionResult;
         this.solutionResult = solutionResult;
+        this.schemaValid = false;
         this.analyze();
     }
 
+    //#region --- GETTER ---
+
+    /**
+     * Gets the submission result.
+     *
+     * @return The submission result.
+     */
+    public XQResult getSubmissionResult() {
+        return submissionResult;
+    }
+
+    /**
+     * Gets the solution result.
+     *
+     * @return The solution result.
+     */
+    public XQResult getSolutionResult() {
+        return solutionResult;
+    }
+
+    /**
+     * Returns whether the schema is valid, i.e. the schema of the submission result is valid with regard to the solution result.
+     *
+     * @return {@code true} if the schema is valid; otherwise {@code false}.
+     */
+    public boolean isSchemaValid() {
+        return schemaValid;
+    }
+
+    /**
+     * Returns the missing nodes.
+     * <p>
+     * Missing nodes are nodes that are contained in the solution result, but not in the submission result.
+     *
+     * @return The missing nodes.
+     */
+    public List<Element> getMissingNodes() {
+        return missingNodes;
+    }
+
+    /**
+     * Returns the superfluous nodes.
+     * <p>
+     * Superfluous nodes are nodes that are contained in the submission result, but not in the solution result.
+     *
+     * @return The superfluous nodes.
+     */
+    public List<Element> getSuperfluousNodes() {
+        return superfluousNodes;
+    }
+
+    /**
+     * Returns the displaced nodes.
+     * <p>
+     * Displaced nodes are nodes that are contained in the submission result, but not at the expected position.
+     *
+     * @return The displaced nodes.
+     */
+    public List<Element> getDisplacedNodes() {
+        return displacedNodes;
+    }
+
+    /**
+     * Returns the missing attributes.
+     * <p>
+     * Missing attributes are attributes that are contained in the solution result, but not in the submission result.
+     *
+     * @return The missing attributes.
+     */
+    public List<Element> getMissingAttributes() {
+        return missingAttributes;
+    }
+
+    /**
+     * Returns the superfluous attributes.
+     * <p>
+     * Superfluous attributes are attributes that are contained in the submission result, but not in the solution result.
+     *
+     * @return The superfluous attributes.
+     */
+    public List<Element> getSuperfluousAttributes() {
+        return superfluousAttributes;
+    }
+
+    /**
+     * Returns the incorrect attribute values.
+     * <p>
+     * Incorrect attribute values are attributes that are contained in the submission result, but have a different value than in the solution result.
+     *
+     * @return The incorrect attribute values.
+     */
+    public List<Element> getIncorrectAttributeValues() {
+        return incorrectAttributeValues;
+    }
+
+    /**
+     * Returns the incorrect text values.
+     * <p>
+     * Incorrect text values are elements that are contained in the submission result, but have a different value than in the solution result.
+     *
+     * @return The incorrect text values.
+     */
+    public List<Element> getIncorrectTextValues() {
+        return incorrectTextValues;
+    }
+
+    //#endregion
+
     /**
      * Analyzes the results.
+     *
+     * @throws AnalysisException If an error occurs during analysis.
      */
-    private void analyze() {
+    private void analyze() throws AnalysisException {
+        this.schemaValid = this.analyzeStructure();
+        this.compare();
+    }
+
+    /**
+     * Analyzes the structure of the submission and the solution by comparing the DTD.
+     * <p>
+     * This can be considered as the first step when analyzing the differences between two
+     * solutions. If the submitted solution is not valid with regard to the given DTD, this means
+     * that basically the structure of the result is incorrect. So any further information about
+     * errors (displaced elements, missing attributes, ...) is understood as hint, how to structure
+     * the result of a query, so that in could be correct at all.
+     *
+     * @return {@code true} if no validation error could be detected, {@code false} if at least one validation error could be detected.
+     * @throws RuntimeException If the submission result could not be validated against the solution DTD.
+     */
+    private boolean analyzeStructure() throws AnalysisException {
+        // Convert result doc to string
+        String xml = this.submissionResult.getResultDocumentRaw();
+
+        // Read DTD
+        String dtd;
+        try {
+            dtd = Files.readString(this.solutionResult.getDTDFile());
+        } catch (IOException ex) {
+            LOG.error("Could not read solution DTD.", ex);
+            throw new AnalysisException("A fatal error occurred when reading the DTD file.", ex);
+        }
+
+        // Build XML again and validate against DTD
+        List<SAXParseException> errors = new ArrayList<>();
+        try {
+            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+            domFactory.setValidating(true);
+            var builder = domFactory.newDocumentBuilder();
+            builder.setErrorHandler(new ErrorHandler() {
+                @Override
+                public void warning(SAXParseException exception) {
+                    LOG.debug("DTD Validation Warning: {}", exception.toString());
+                    errors.add(exception);
+                }
+
+                @Override
+                public void error(SAXParseException exception) {
+                    LOG.debug("DTD Validation Error: {}", exception.toString());
+                    errors.add(exception);
+                }
+
+                @Override
+                public void fatalError(SAXParseException exception) {
+                    LOG.debug("DTD Validation Fatal Error: {}", exception.toString());
+                    errors.add(exception);
+                }
+            });
+            String tmp = "<!DOCTYPE " + XQResult.XML_ROOT + " [" + System.lineSeparator() + dtd + System.lineSeparator() + "]>" + System.lineSeparator() + xml;
+            builder.parse(new ByteArrayInputStream(tmp.getBytes(StandardCharsets.UTF_8)));
+            return errors.isEmpty();
+        } catch (ParserConfigurationException | IOException | SAXException ex) {
+            LOG.error("Could not validate submission result against solution DTD.", ex);
+            throw new AnalysisException("A fatal error occurred when parsing the XML document against a DTD.", ex);
+        }
+    }
+
+    /**
+     * Compares the submission and the solution.
+     *
+     * @throws AnalysisException If an error occurs during comparison.
+     */
+    private void compare() throws AnalysisException {
+        if (this.solutionResult.getResultDocument() == null || this.submissionResult.getResultDocument() == null)
+            return; // cannot compare if not both are valid XML documents
+
         String diff = this.generateDiff();
-        String analysis = this.transformDiffToAnalysis(diff);
+        Document diffDoc = this.transformDiffToAnalysis(diff);
+        Element root = diffDoc.getDocumentElement();
+
+        // missingNodes
+        this.missingNodes = new ArrayList<>();
+        loadDiffNodes(root, "missingNodes", this.missingNodes::add);
+
+        // missingNodes
+        this.superfluousNodes = new ArrayList<>();
+        loadDiffNodes(root, "superfluousNodes", this.superfluousNodes::add);
+
+        // missingAttributes
+        this.missingAttributes = new ArrayList<>();
+        loadDiffNodes(root, "missingAttributes", this.missingAttributes::add);
+
+        // superfluousAttributes
+        this.superfluousAttributes = new ArrayList<>();
+        loadDiffNodes(root, "superfluousAttributes", this.superfluousAttributes::add);
+
+        // incorrectAttributeValues
+        this.incorrectAttributeValues = new ArrayList<>();
+        loadDiffNodes(root, "incorrectAttributeValues", this.incorrectAttributeValues::add);
+
+        // incorrectTextValues
+        this.incorrectTextValues = new ArrayList<>();
+        loadDiffNodes(root, "incorrectTextValues", this.incorrectTextValues::add);
+
+        // displacedNodes
+        this.displacedNodes = new ArrayList<>();
+        // TODO: implement
+    }
+
+    /**
+     * Loads the difference nodes from the diff XML.
+     *
+     * @param root       The root element of the diff XML.
+     * @param tagName    The tag name of the difference nodes.
+     * @param addElement The consumer to add the difference nodes.
+     */
+    private static void loadDiffNodes(Element root, String tagName, Consumer<Element> addElement) {
+        NodeList nodeList = root.getElementsByTagName(tagName);
+        if (nodeList.getLength() <= 0)
+            return;
+
+        Element element = (Element) nodeList.item(0);
+        nodeList = element.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE)
+                addElement.accept((Element) node);
+        }
     }
 
     /**
      * Generates the diff between the submission and the solution.
      *
      * @return The diff as XML.
-     * @throws RuntimeException If the diff could not be generated.
+     * @throws AnalysisException If the diff could not be generated.
      */
-    private String generateDiff() {
-        try (var submissionReader = new StringReader(this.submissionResult.getRawResult());
-             var solutionReader = new StringReader(this.solutionResult.getRawResult());
+    private String generateDiff() throws AnalysisException {
+        try (var submissionReader = new StringReader(this.submissionResult.getResultDocumentRaw());
+             var solutionReader = new StringReader(this.solutionResult.getResultDocumentRaw());
              var writer = new StringWriter()) {
-            Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.IGNORE, TextGranularity.TEXT));
+            Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.PRESERVE, TextGranularity.TEXT));
 
             String diffXml = writer.toString();
             Files.writeString(Path.of("xml-documents", "diff.xml"), diffXml); // TODO: remove, only here for debugging
+
             return diffXml;
         } catch (IOException | DiffException ex) {
             LOG.error("Could not generate diff.", ex);
-            throw new RuntimeException(ex);
+            throw new AnalysisException("Could not calculate the difference of submission and solution documents.", ex);
         }
     }
 
-    private String transformDiffToAnalysis(String diffXml) {
+    /**
+     * Transforms the diff XML to an analysis XML.
+     *
+     * @param diffXml The diff XML.
+     * @return The analysis XML.
+     * @throws AnalysisException If the diff XML could not be transformed.
+     */
+    private Document transformDiffToAnalysis(String diffXml) throws AnalysisException {
         try (var writer = new StringWriter();
              var reader = new StringReader(diffXml);
-//             var xslt = this.getClass().getClassLoader().getResourceAsStream("transform.xslt")) {
-             var xslt = new FileInputStream("/Users/martin/Development/dke/etutor_neu/task-app-xquery/src/main/resources/transform.xslt")) {
+             var xslt = this.getClass().getClassLoader().getResourceAsStream("transform.xslt")) {
             Processor processor = new Processor(false);
             XsltCompiler compiler = processor.newXsltCompiler();
 
@@ -112,10 +357,17 @@ public class Analysis {
 
             String result = writer.toString();
             Files.writeString(Path.of("xml-documents", "diff-transformed.xml"), result); // TODO: remove, only here for debugging
-            return result;
-        } catch (IOException | SaxonApiException e) {
-            throw new RuntimeException(e);
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return builder.parse(new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
+        } catch (IOException | SaxonApiException ex) {
+            LOG.error("Could not transform diff XML document.", ex);
+            throw new AnalysisException("A fatal error occurred when transforming the diff XML.", ex);
+        } catch (ParserConfigurationException ex) {
+            LOG.error("Could not parse diff XML document.", ex);
+            throw new AnalysisException("A fatal error occurred when creating the XML parser.", ex);
+        } catch (SAXException ex) {
+            LOG.error("Could not parse diff XML document.", ex);
+            throw new AnalysisException("A fatal error occurred when parsing the diff XML document.", ex);
         }
     }
 }
-// https://github.com/codelibs/jhighlight

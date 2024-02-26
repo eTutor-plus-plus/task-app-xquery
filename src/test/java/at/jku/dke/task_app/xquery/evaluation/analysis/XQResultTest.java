@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class XQResultTest {
 
     @Test
-    void getRawResult() {
+    void getRawResult() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -27,7 +27,7 @@ class XQResultTest {
     }
 
     @Test
-    void getResultDocument_validXml() {
+    void getResultDocument_validXml() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -44,7 +44,7 @@ class XQResultTest {
     }
 
     @Test
-    void getResultDocument_invalidXml() {
+    void getResultDocument_invalidXml() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -60,7 +60,7 @@ class XQResultTest {
     }
 
     @Test
-    void getParseException_validXml() {
+    void getParseException_validXml() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -76,7 +76,7 @@ class XQResultTest {
     }
 
     @Test
-    void getParseException_invalidXml() {
+    void getParseException_invalidXml() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -92,7 +92,7 @@ class XQResultTest {
     }
 
     @Test
-    void getResultFile_generate() {
+    void getResultFile_generate() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -114,7 +114,7 @@ class XQResultTest {
     }
 
     @Test
-    void getResultFile_regenerate() {
+    void getResultFile_regenerate() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -132,7 +132,7 @@ class XQResultTest {
     }
 
     @Test
-    void getResultFile_dontRegenerate() {
+    void getResultFile_dontRegenerate() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -150,7 +150,7 @@ class XQResultTest {
     }
 
     @Test
-    void getResultFile_invalidXml() {
+    void getResultFile_invalidXml() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -171,7 +171,7 @@ class XQResultTest {
     }
 
     @Test
-    void getDTDFile_generate() {
+    void getDTDFile_generate() throws AnalysisException {
         // Arrange
         var xml = """
             <mietstatistik>
@@ -201,7 +201,7 @@ class XQResultTest {
     }
 
     @Test
-    void getDTDFile_regenerate() {
+    void getDTDFile_regenerate() throws AnalysisException {
         // Arrange
         var xml = """
             <mietstatistik>
@@ -223,7 +223,7 @@ class XQResultTest {
     }
 
     @Test
-    void getDTDFile_dontRegenerate() {
+    void getDTDFile_dontRegenerate() throws AnalysisException {
         // Arrange
         var xml = """
             <mietstatistik>
@@ -245,7 +245,7 @@ class XQResultTest {
     }
 
     @Test
-    void getDTDFile_invalidXml() {
+    void getDTDFile_invalidXml() throws AnalysisException {
         // Arrange
         var xml = """
             <root>
@@ -254,7 +254,7 @@ class XQResultTest {
         var xqResult = new XQResult(xml);
 
         // Act & Assert
-        assertThrows(IllegalStateException.class, xqResult::getDTDFile);
+        assertThrows(AnalysisException.class, xqResult::getDTDFile);
     }
 
 }

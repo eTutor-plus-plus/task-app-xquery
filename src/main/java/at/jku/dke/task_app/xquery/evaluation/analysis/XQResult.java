@@ -36,6 +36,7 @@ public class XQResult {
 
     private final String rawResult;
     private Document resultDocument;
+    private String resultDocumentRaw;
     private SAXException parseException;
     private Path dtdFile;
     private Path resultFile;
@@ -44,8 +45,9 @@ public class XQResult {
      * Creates a new instance of class {@link XQResult}.
      *
      * @param rawResult The raw result of the XQuery execution.
+     * @throws AnalysisException If the raw result could not be parsed into an XML document.
      */
-    public XQResult(String rawResult) {
+    public XQResult(String rawResult) throws AnalysisException {
         Objects.requireNonNull(rawResult);
         this.rawResult = rawResult;
         this.parseRawResult();
@@ -72,6 +74,15 @@ public class XQResult {
     }
 
     /**
+     * Returns the result of the XQuery execution as an XML string.
+     *
+     * @return The result of the XQuery execution as an XML string or {@code null} if {@link #getParseException()} is not {@code null}.
+     */
+    public String getResultDocumentRaw() {
+        return resultDocumentRaw;
+    }
+
+    /**
      * Returns the parse exception that occurred during the parsing of the raw result.
      *
      * @return The parse exception that occurred during the parsing of the raw result or {@code null} if the raw result could be parsed successfully.
@@ -88,9 +99,9 @@ public class XQResult {
      * Returns the path to the result file of the XQuery execution.
      *
      * @return The path to the result file of the XQuery execution.
-     * @throws RuntimeException If the result file could not be created.
+     * @throws AnalysisException If the result file could not be created.
      */
-    public Path getResultFile() {
+    public Path getResultFile() throws AnalysisException {
         return this.getResultFile(false);
     }
 
@@ -99,9 +110,9 @@ public class XQResult {
      *
      * @param forceRegeneration If {@code true}, the result file is regenerated; otherwise, the cached result file is returned (if available).
      * @return The path to the result file of the XQuery execution.
-     * @throws RuntimeException If the result file could not be created.
+     * @throws AnalysisException If the result file could not be created.
      */
-    public Path getResultFile(boolean forceRegeneration) {
+    public Path getResultFile(boolean forceRegeneration) throws AnalysisException {
         if (this.resultFile == null || forceRegeneration) {
             try {
                 this.resultFile = Files.createTempFile("xq-result", ".xml");
@@ -116,7 +127,7 @@ public class XQResult {
                 }
             } catch (IOException | TransformerException ex) {
                 LOG.error("Could not write XML document to file.", ex);
-                throw new RuntimeException(ex);
+                throw new AnalysisException("A fatal error occurred when creating the query result file.", ex);
             }
         }
         return this.resultFile;
@@ -130,9 +141,9 @@ public class XQResult {
      * Returns the path to the DTD file for the result file.
      *
      * @return The path to the DTD file for the result file.
-     * @throws RuntimeException If the DTD file could not be created.
+     * @throws AnalysisException If the DTD file could not be created.
      */
-    public Path getDTDFile() {
+    public Path getDTDFile() throws AnalysisException {
         return this.getDTDFile(false);
     }
 
@@ -141,18 +152,18 @@ public class XQResult {
      *
      * @param forceRegeneration If {@code true}, the DTD file is regenerated; otherwise, the cached DTD file is returned (if available).
      * @return The path to the DTD file for the result file.
-     * @throws RuntimeException If the DTD file could not be created.
+     * @throws AnalysisException If the DTD file could not be created.
      */
-    public Path getDTDFile(boolean forceRegeneration) {
+    public Path getDTDFile(boolean forceRegeneration) throws AnalysisException {
         if (this.parseException != null)
-            throw new IllegalStateException("The raw result could not be parsed into an XML document.", this.parseException);
+            throw new AnalysisException("The raw result could not be parsed into an XML document.", this.parseException);
 
         if (this.dtdFile == null || forceRegeneration) {
             try {
                 this.dtdFile = this.generateDTD(this.getResultFile(forceRegeneration));
             } catch (IOException ex) {
                 LOG.error("Could not generate DTD file.", ex);
-                throw new RuntimeException(ex);
+                throw new AnalysisException("A fatal error occurred when generating the document type definition from the query result.", ex);
             }
         }
 
@@ -182,21 +193,22 @@ public class XQResult {
     /**
      * Parses the raw result into an XML document.
      */
-    private void parseRawResult() {
+    private void parseRawResult() throws AnalysisException {
         try {
             LOG.debug("Parsing XML document");
-            String xml = '<' + XQResult.XML_ROOT + '>' + this.rawResult + "</" + XQResult.XML_ROOT + '>';
+            this.resultDocumentRaw = '<' + XQResult.XML_ROOT + '>' + System.lineSeparator() + this.rawResult + System.lineSeparator() + "</" + XQResult.XML_ROOT + '>';
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            this.resultDocument = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+            this.resultDocument = builder.parse(new ByteArrayInputStream(this.resultDocumentRaw.getBytes(StandardCharsets.UTF_8)));
         } catch (ParserConfigurationException ex) {
             LOG.error("Could not create document builder.", ex);
-            throw new RuntimeException(ex);
+            throw new AnalysisException("A fatal error occurred when creating the XML parser.", ex);
         } catch (IOException ex) {
             LOG.error("Could not convert XML document to byte-stream.", ex);
-            throw new RuntimeException(ex);
+            throw new AnalysisException("A fatal error occurred when parsing the XML document.", ex);
         } catch (SAXException ex) {
             LOG.warn("Invalid XML document.", ex);
             this.parseException = ex;
+            this.resultDocument = null;
         }
     }
 
