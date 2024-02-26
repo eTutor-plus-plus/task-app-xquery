@@ -43,6 +43,9 @@ public class ClientSetupExtension implements BeforeAllCallback {
         System.setProperty("clients.api-keys[2].name", "moodle");
         System.setProperty("clients.api-keys[2].key", READ_API_KEY);
         System.setProperty("clients.api-keys[2].roles[0]", AuthConstants.READ_SUBMISSION);
+
+        System.setProperty("xquery.executor", "basex");
+        System.setProperty("xquery.xml-directory", "./saxon");
     }
 
 }

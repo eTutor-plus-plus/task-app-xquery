@@ -30,19 +30,16 @@ import java.util.Locale;
 public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup, ModifyXQueryTaskGroupDto> {
 
     private final MessageSource messageSource;
-    private final XQuerySettings settings;
 
     /**
      * Creates a new instance of class {@link XQueryTaskGroupService}.
      *
      * @param repository    The task group repository.
      * @param messageSource The message source.
-     * @param settings      The XQuery settings.
      */
-    public XQueryTaskGroupService(XQueryTaskGroupRepository repository, MessageSource messageSource, XQuerySettings settings) {
+    public XQueryTaskGroupService(XQueryTaskGroupRepository repository, MessageSource messageSource) {
         super(repository);
         this.messageSource = messageSource;
-        this.settings = settings;
     }
 
     @Override

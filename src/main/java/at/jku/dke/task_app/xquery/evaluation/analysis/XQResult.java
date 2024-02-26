@@ -211,6 +211,4 @@ public class XQResult {
             this.resultDocument = null;
         }
     }
-
-    // TODO: validate sortedNodes
 }

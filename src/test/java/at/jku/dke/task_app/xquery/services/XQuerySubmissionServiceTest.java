@@ -7,50 +7,48 @@ import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
 import at.jku.dke.task_app.xquery.evaluation.EvaluationService;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class XQuerySubmissionServiceTest {
+    @Test
+    void createSubmissionEntity() {
+        // Arrange
+        var service = new XQuerySubmissionService(null, null, null);
+        var dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 7L, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("test-input"));
 
-//    @Test
-//    void createSubmissionEntity() {
-//        // Arrange
-//        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 3L, "de", SubmissionMode.SUBMIT, 2, new XQuerySubmissionDto("33"));
-//        XQuerySubmissionService service = new XQuerySubmissionService(null, null, null);
-//
-//        // Act
-//        XQuerySubmission submission = service.createSubmissionEntity(dto);
-//
-//        // Assert
-//        assertEquals(dto.submission().input(), submission.getSubmission());
-//    }
-//
-//    @Test
-//    void mapSubmissionToSubmissionData() {
-//        // Arrange
-//        XQuerySubmission submission = new XQuerySubmission("33");
-//        XQuerySubmissionService service = new XQuerySubmissionService(null, null, null);
-//
-//        // Act
-//        XQuerySubmissionDto dto = service.mapSubmissionToSubmissionData(submission);
-//
-//        // Assert
-//        assertEquals(submission.getSubmission(), dto.input());
-//    }
-//
-//    @Test
-//    void evaluate() {
-//        // Arrange
-//        var evalService = mock(EvaluationService.class);
-//        SubmitSubmissionDto<XQuerySubmissionDto> dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 3L, "de", SubmissionMode.SUBMIT, 2, new XQuerySubmissionDto("33"));
-//        XQuerySubmissionService service = new XQuerySubmissionService(null, null, evalService);
-//
-//        // Act
-//        var result = service.evaluate(dto);
-//
-//        // Assert
-//        verify(evalService).evaluate(dto);
-//    }
+        // Act
+        var submission = service.createSubmissionEntity(dto);
 
+        // Assert
+        assertEquals(dto.submission().input(), submission.getSubmission());
+    }
+
+    @Test
+    void mapSubmissionToSubmissionData() {
+        // Arrange
+        var service = new XQuerySubmissionService(null, null, null);
+        var submission = new XQuerySubmission("test-input");
+
+        // Act
+        var dto = service.mapSubmissionToSubmissionData(submission);
+
+        // Assert
+        assertEquals(submission.getSubmission(), dto.input());
+    }
+
+    @Test
+    void evaluate() {
+        // Arrange
+        var evalService = mock(EvaluationService.class);
+        var dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 7L, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("test-input"));
+        var service = new XQuerySubmissionService(null, null, evalService);
+
+        // Act
+        service.evaluate(dto);
+
+        // Assert
+        verify(evalService).evaluate(dto);
+    }
 }

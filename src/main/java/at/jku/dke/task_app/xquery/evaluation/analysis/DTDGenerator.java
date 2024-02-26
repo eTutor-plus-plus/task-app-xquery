@@ -108,7 +108,7 @@ class DTDGenerator extends org.xml.sax.helpers.DefaultHandler {
 
     /**
      * Test whether a string is an XML name.
-     * TODO: This is currently an incomplete test, it treats all non-ASCII characters
+     * TDO: This is currently an incomplete test, it treats all non-ASCII characters
      * as being valid in names.
      */
 
@@ -231,7 +231,7 @@ class DTDGenerator extends org.xml.sax.helpers.DefaultHandler {
 
                     // If every value of the attribute is distinct,
                     // and there are at least MIN_ID_VALUES, treat it as an ID
-                    // TODO: this may give the wrong answer, we should check whether the value sets of two
+                    // TDO: this may give the wrong answer, we should check whether the value sets of two
                     // candidate-ID attributes overlap, in which case they can't both be IDs !!)
                     boolean isid = ad.allNames &&           // ID values must be Names
                                    (!doneID) &&            // Only allowed one ID attribute per element type

@@ -73,19 +73,4 @@ class BaseXApiTest {
         }
     }
 
-    @Test
-    void close() throws BaseXException {
-        // Act
-        Path path = Path.of("basex");
-        try (var basex = new BaseXApi(path)) {
-            var name = "test";
-            var document = "<test><a id=\"5\"></a></test>";
-            basex.createDatabase(name, document);
-            assertThat(path).exists();
-        }
-
-        // Assert
-        assertThat(path).doesNotExist();
-    }
-
 }

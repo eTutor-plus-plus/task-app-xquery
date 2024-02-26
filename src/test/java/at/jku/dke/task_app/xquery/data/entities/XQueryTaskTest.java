@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class XQueryTaskTest {
 
     @Test
-    void testConstructor1() {
+    void constructor1() {
         // Arrange
         final String solution = "//country/name";
         final List<String> sorting = List.of("//path");
@@ -28,7 +28,7 @@ class XQueryTaskTest {
     }
 
     @Test
-    void testConstructor2() {
+    void constructor2() {
         // Arrange
         final String solution = "//country/name";
         final List<String> sorting = List.of("//path");
@@ -54,7 +54,7 @@ class XQueryTaskTest {
     }
 
     @Test
-    void testConstructor3() {
+    void constructor3() {
         // Arrange
         final String solution = "//country/name";
         final List<String> sorting = List.of("//path");
@@ -83,7 +83,7 @@ class XQueryTaskTest {
     }
 
     @Test
-    void testGetSetSolution() {
+    void getSetSolution() {
         // Arrange
         var task = new XQueryTask();
         final String expected = "//country/name";
@@ -97,7 +97,7 @@ class XQueryTaskTest {
     }
 
     @Test
-    void testGetSetSorting() {
+    void getSetSorting() {
         // Arrange
         var task = new XQueryTask();
         final List<String> expected = List.of("//path");

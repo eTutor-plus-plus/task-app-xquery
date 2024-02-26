@@ -30,7 +30,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -74,6 +73,7 @@ public class Analysis {
         this.solutionResult = solutionResult;
         this.schemaValid = false;
         this.sorting = sorting == null ? List.of() : sorting;
+        this.validateSortingExpressions();
         this.analyze();
     }
 
@@ -356,9 +356,7 @@ public class Analysis {
              var writer = new StringWriter()) {
             Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.IGNORE, TextGranularity.TEXT));
 
-            String diffXml = writer.toString();
-            Files.writeString(Path.of("xml-documents", "diff.xml"), diffXml);  // TODO: remove for production
-            return diffXml;
+            return writer.toString();
         } catch (IOException | DiffException ex) {
             LOG.error("Could not generate diff.", ex);
             throw new AnalysisException("Could not calculate the difference of submission and solution documents.", ex);
@@ -390,7 +388,6 @@ public class Analysis {
             transformer.transform(new StreamSource(reader), out);
 
             String result = writer.toString();
-            Files.writeString(Path.of("xml-documents", "diff-transform.xml"), result);  // TODO: remove for production
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             return builder.parse(new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
         } catch (IOException | SaxonApiException ex) {
@@ -436,6 +433,27 @@ public class Analysis {
         } catch (XPathExpressionException ex) {
             LOG.error("Could not compile XPath expression.", ex);
             throw new AnalysisException("A fatal error occurred while analyzing the order of the result elements.", ex);
+        }
+    }
+
+    /**
+     * Validates the sorting XPath expressions.
+     *
+     * @throws AnalysisException If an expression is invalid.
+     */
+    private void validateSortingExpressions() throws AnalysisException {
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        for (String expression : this.sorting) {
+            try {
+                XPathExpression xExpr = xpath.compile(expression);
+                NodeList solutionList = (NodeList) xExpr.evaluate(this.getSolutionResult().getResultDocument(), XPathConstants.NODESET);
+
+                if (solutionList.getLength() == 0)
+                    throw new AnalysisException("The sorting expression '" + expression + "' does not match any nodes in the solution result.");
+            } catch (XPathExpressionException ex) {
+                LOG.error("Could not compile XPath expression: " + expression, ex);
+                throw new AnalysisException("A fatal error occurred while compiling XPath expression: " + expression, ex);
+            }
         }
     }
 }
