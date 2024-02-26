@@ -124,7 +124,7 @@ public class EvaluationService {
 
         // analyze, grade, feedback
         try {
-            var analysis = new Analysis(new XQResult(submissionResult), new XQResult(solutionResult));
+            var analysis = new Analysis(new XQResult(submissionResult), new XQResult(solutionResult), task.getSorting());
         } catch (AnalysisException e) {
             throw new RuntimeException(e);
         }

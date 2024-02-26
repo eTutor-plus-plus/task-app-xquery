@@ -1,6 +1,8 @@
 package at.jku.dke.task_app.xquery.evaluation.analysis;
 
 import at.jku.dke.task_app.xquery.evaluation.EvaluationService;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import net.sf.saxon.s9api.*;
 import org.pageseeder.diffx.DiffException;
 import org.pageseeder.diffx.Main;
@@ -21,6 +23,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -32,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Analyzes and prepares the evaluation of a submission.
@@ -41,31 +45,35 @@ public class Analysis {
 
     private final XQResult submissionResult;
     private final XQResult solutionResult;
+    private final List<String> sorting;
 
     private boolean schemaValid;
-    private List<Element> missingNodes;
-    private List<Element> superfluousNodes;
-    private List<Element> displacedNodes;
-    private List<Element> missingAttributes; // fehlende Attribute
-    private List<Element> superfluousAttributes; // überflüssige Attribute
-    private List<Element> incorrectAttributeValues; // falsche Attributwerte
-    private List<Element> incorrectTextValues; // falsche Elementwerte
+    private Document diffDocument;
+    private List<NodeModel> missingNodes;
+    private List<NodeModel> superfluousNodes;
+    private List<IncorrectTextValueModel> incorrectTextValues;
+    private List<NodeModel> displacedNodes;
+    private List<AttributeModel> missingAttributes;
+    private List<AttributeModel> superfluousAttributes;
+    private List<IncorrectAttributeValueModel> incorrectAttributeValues;
 
     /**
      * Creates a new instance of class {@link Analysis} and analyzes the results.
      *
      * @param submissionResult The result of the submission.
      * @param solutionResult   The result of the solution.
+     * @param sorting          The XPath expressions to check the sorting of the nodes.
      * @throws NullPointerException If {@code submissionResult} or {@code solutionResult} is {@code null}.
      * @throws AnalysisException    If an error occurs during analysis.
      */
-    public Analysis(XQResult submissionResult, XQResult solutionResult) throws AnalysisException {
+    public Analysis(XQResult submissionResult, XQResult solutionResult, List<String> sorting) throws AnalysisException {
         Objects.requireNonNull(submissionResult);
         Objects.requireNonNull(solutionResult);
 
         this.submissionResult = submissionResult;
         this.solutionResult = solutionResult;
         this.schemaValid = false;
+        this.sorting = sorting == null ? List.of() : sorting;
         this.analyze();
     }
 
@@ -99,13 +107,22 @@ public class Analysis {
     }
 
     /**
+     * Returns the diff document.
+     *
+     * @return The document with diff annotations.
+     */
+    public Document getDiffDocument() {
+        return diffDocument;
+    }
+
+    /**
      * Returns the missing nodes.
      * <p>
      * Missing nodes are nodes that are contained in the solution result, but not in the submission result.
      *
      * @return The missing nodes.
      */
-    public List<Element> getMissingNodes() {
+    public List<NodeModel> getMissingNodes() {
         return missingNodes;
     }
 
@@ -116,8 +133,19 @@ public class Analysis {
      *
      * @return The superfluous nodes.
      */
-    public List<Element> getSuperfluousNodes() {
+    public List<NodeModel> getSuperfluousNodes() {
         return superfluousNodes;
+    }
+
+    /**
+     * Returns the incorrect text values.
+     * <p>
+     * Incorrect text values are elements that are contained in the submission result, but have a different value than in the solution result.
+     *
+     * @return The incorrect text values.
+     */
+    public List<IncorrectTextValueModel> getIncorrectTextValues() {
+        return incorrectTextValues;
     }
 
     /**
@@ -127,7 +155,7 @@ public class Analysis {
      *
      * @return The displaced nodes.
      */
-    public List<Element> getDisplacedNodes() {
+    public List<NodeModel> getDisplacedNodes() {
         return displacedNodes;
     }
 
@@ -138,7 +166,7 @@ public class Analysis {
      *
      * @return The missing attributes.
      */
-    public List<Element> getMissingAttributes() {
+    public List<AttributeModel> getMissingAttributes() {
         return missingAttributes;
     }
 
@@ -149,7 +177,7 @@ public class Analysis {
      *
      * @return The superfluous attributes.
      */
-    public List<Element> getSuperfluousAttributes() {
+    public List<AttributeModel> getSuperfluousAttributes() {
         return superfluousAttributes;
     }
 
@@ -160,19 +188,8 @@ public class Analysis {
      *
      * @return The incorrect attribute values.
      */
-    public List<Element> getIncorrectAttributeValues() {
+    public List<IncorrectAttributeValueModel> getIncorrectAttributeValues() {
         return incorrectAttributeValues;
-    }
-
-    /**
-     * Returns the incorrect text values.
-     * <p>
-     * Incorrect text values are elements that are contained in the submission result, but have a different value than in the solution result.
-     *
-     * @return The incorrect text values.
-     */
-    public List<Element> getIncorrectTextValues() {
-        return incorrectTextValues;
     }
 
     //#endregion
@@ -256,36 +273,36 @@ public class Analysis {
             return; // cannot compare if not both are valid XML documents
 
         String diff = this.generateDiff();
-        Document diffDoc = this.transformDiffToAnalysis(diff);
-        Element root = diffDoc.getDocumentElement();
+        this.diffDocument = this.transformDiffToAnalysis(diff);
+        Element root = this.diffDocument.getDocumentElement();
 
         // missingNodes
         this.missingNodes = new ArrayList<>();
-        loadDiffNodes(root, "missingNodes", this.missingNodes::add);
+        loadDiffNodes(root, "missingNodes", this.missingNodes::add, e -> xmlToObject(e, NodeModel.class));
 
         // missingNodes
         this.superfluousNodes = new ArrayList<>();
-        loadDiffNodes(root, "superfluousNodes", this.superfluousNodes::add);
+        loadDiffNodes(root, "superfluousNodes", this.superfluousNodes::add, e -> xmlToObject(e, NodeModel.class));
 
         // missingAttributes
         this.missingAttributes = new ArrayList<>();
-        loadDiffNodes(root, "missingAttributes", this.missingAttributes::add);
+        loadDiffNodes(root, "missingAttributes", this.missingAttributes::add, e -> xmlToObject(e, AttributeModel.class));
 
         // superfluousAttributes
         this.superfluousAttributes = new ArrayList<>();
-        loadDiffNodes(root, "superfluousAttributes", this.superfluousAttributes::add);
+        loadDiffNodes(root, "superfluousAttributes", this.superfluousAttributes::add, e -> xmlToObject(e, AttributeModel.class));
 
         // incorrectAttributeValues
         this.incorrectAttributeValues = new ArrayList<>();
-        loadDiffNodes(root, "incorrectAttributeValues", this.incorrectAttributeValues::add);
+        loadDiffNodes(root, "incorrectAttributeValues", this.incorrectAttributeValues::add, e -> xmlToObject(e, IncorrectAttributeValueModel.class));
 
         // incorrectTextValues
         this.incorrectTextValues = new ArrayList<>();
-        loadDiffNodes(root, "incorrectTextValues", this.incorrectTextValues::add);
+        loadDiffNodes(root, "incorrectTextValues", this.incorrectTextValues::add, e -> xmlToObject(e, IncorrectTextValueModel.class));
 
         // displacedNodes
         this.displacedNodes = new ArrayList<>();
-        // TODO: implement
+        this.checkSorting();
     }
 
     /**
@@ -295,7 +312,7 @@ public class Analysis {
      * @param tagName    The tag name of the difference nodes.
      * @param addElement The consumer to add the difference nodes.
      */
-    private static void loadDiffNodes(Element root, String tagName, Consumer<Element> addElement) {
+    private static <T> void loadDiffNodes(Element root, String tagName, Consumer<T> addElement, Function<Element, T> mapper) {
         NodeList nodeList = root.getElementsByTagName(tagName);
         if (nodeList.getLength() <= 0)
             return;
@@ -305,7 +322,25 @@ public class Analysis {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE)
-                addElement.accept((Element) node);
+                addElement.accept(mapper.apply((Element) node));
+        }
+    }
+
+    /**
+     * Unmarshals the XML to an object.
+     *
+     * @param element The XML element.
+     * @param clazz   The class of the object.
+     * @param <T>     The type of the object.
+     * @return The object.
+     */
+    private static <T> T xmlToObject(Element element, Class<T> clazz) {
+        try {
+            JAXBContext ctx = JAXBContext.newInstance(clazz);
+            return ctx.createUnmarshaller().unmarshal(element, clazz).getValue();
+        } catch (JAXBException ex) {
+            LOG.error("Could not unmarshal XML to object.", ex);
+            throw new RuntimeException("A fatal error occurred when parsing diff result.", ex);
         }
     }
 
@@ -319,11 +354,10 @@ public class Analysis {
         try (var submissionReader = new StringReader(this.submissionResult.getResultDocumentRaw());
              var solutionReader = new StringReader(this.solutionResult.getResultDocumentRaw());
              var writer = new StringWriter()) {
-            Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.PRESERVE, TextGranularity.TEXT));
+            Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.IGNORE, TextGranularity.TEXT));
 
             String diffXml = writer.toString();
-            Files.writeString(Path.of("xml-documents", "diff.xml"), diffXml); // TODO: remove, only here for debugging
-
+            Files.writeString(Path.of("xml-documents", "diff.xml"), diffXml);  // TODO: remove for production
             return diffXml;
         } catch (IOException | DiffException ex) {
             LOG.error("Could not generate diff.", ex);
@@ -356,7 +390,7 @@ public class Analysis {
             transformer.transform(new StreamSource(reader), out);
 
             String result = writer.toString();
-            Files.writeString(Path.of("xml-documents", "diff-transformed.xml"), result); // TODO: remove, only here for debugging
+            Files.writeString(Path.of("xml-documents", "diff-transform.xml"), result);  // TODO: remove for production
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             return builder.parse(new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
         } catch (IOException | SaxonApiException ex) {
@@ -368,6 +402,40 @@ public class Analysis {
         } catch (SAXException ex) {
             LOG.error("Could not parse diff XML document.", ex);
             throw new AnalysisException("A fatal error occurred when parsing the diff XML document.", ex);
+        }
+    }
+
+    /**
+     * Checks the sorting of the result elements.
+     *
+     * @throws AnalysisException If an error occurs during sorting check.
+     */
+    private void checkSorting() throws AnalysisException {
+        assert this.getSubmissionResult().getResultDocument() != null;
+        if (this.sorting.isEmpty())
+            return;
+
+        try {
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            for (String expression : this.sorting) {
+                XPathExpression xExpr = xpath.compile(expression);
+                NodeList submissionList = (NodeList) xExpr.evaluate(this.getSubmissionResult().getResultDocument(), XPathConstants.NODESET);
+                NodeList solutionList = (NodeList) xExpr.evaluate(this.getSolutionResult().getResultDocument(), XPathConstants.NODESET);
+
+                if (submissionList.getLength() != solutionList.getLength())
+                    continue; // do not check, something else is wrong
+
+                for (int i = 0; i < submissionList.getLength(); i++) {
+                    Node submissionNode = submissionList.item(i);
+                    Node solutionNode = solutionList.item(i);
+
+                    if (!submissionNode.isEqualNode(solutionNode))
+                        this.displacedNodes.add(new NodeModel(expression, submissionNode.getNodeName()));
+                }
+            }
+        } catch (XPathExpressionException ex) {
+            LOG.error("Could not compile XPath expression.", ex);
+            throw new AnalysisException("A fatal error occurred while analyzing the order of the result elements.", ex);
         }
     }
 }

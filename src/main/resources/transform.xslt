@@ -12,12 +12,22 @@
             <!-- Nodes -->
             <missingNodes>
                 <xsl:for-each select="//*[@diff:insert='true']">
-                    <xsl:call-template name="generateXPathElement"/>
+                    <!-- insert only if no other element at the same level diff:delete exists -->
+                    <!-- TODO: check content and attributes?? e.g. text() = current()/text() -->
+                    <xsl:variable name="otherDel" select="//*[name() = current()/name() and ./.. = current()/..]/@diff:delete"/>
+                    <xsl:if test="not($otherDel)">
+                        <xsl:call-template name="generateXPathElement"/>
+                    </xsl:if>
                 </xsl:for-each>
             </missingNodes>
             <superfluousNodes>
                 <xsl:for-each select="//*[@diff:delete='true']">
-                    <xsl:call-template name="generateXPathElement"/>
+                    <!-- insert only if no other element at the same level with diff:insert exists -->
+                    <!-- TODO: check content and attributes?? e.g. text() = current()/text() -->
+                    <xsl:variable name="otherIns" select="//*[name() = current()/name() and ./.. = current()/..]/@diff:insert"/>
+                    <xsl:if test="not($otherIns)">
+                        <xsl:call-template name="generateXPathElement"/>
+                    </xsl:if>
                 </xsl:for-each>
             </superfluousNodes>
             <incorrectTextValues>
@@ -26,11 +36,11 @@
                     <xsl:variable name="currIns" select="$currNode/diff:ins"/>
                     <xsl:variable name="currDel" select="$currNode/diff:del"/>
 
-                    <!-- insert only if the same in the opposite direction does not exist, because then it is just different order and order is checked somewhere else -->
                     <xsl:choose>
+                        <!-- insert only if not both ins and del with same content exist -->
                         <xsl:when test="$currIns and $currDel">
-                            <xsl:variable name="otherDel" select="//*[name() = $currNode/name() and parent = $currNode/parent]/diff:del[text() = $currIns/text()]"/>
-                            <xsl:variable name="otherIns" select="//*[name() = $currNode/name() and parent = $currNode/parent]/diff:ins[text() = $currDel/text()]"/>
+                            <xsl:variable name="otherDel" select="//*[name() = $currNode/name() and ./.. = $currNode/..]/diff:del[text() = $currIns/text()]"/>
+                            <xsl:variable name="otherIns" select="//*[name() = $currNode/name() and ./.. = $currNode/..]/diff:ins[text() = $currDel/text()]"/>
                             <xsl:if test="not($otherDel and $otherIns)">
                                 <xsl:call-template name="generateXPathElementText"/>
                             </xsl:if>
@@ -48,8 +58,12 @@
                     <xsl:variable name="currNode" select="current()"/>
                     <xsl:for-each select="@ins:*">
                         <xsl:variable name="attName" select="local-name(.)"/>
-                        <xsl:if test="not($currNode/@del:*[local-name() = $attName])">
-                            <!-- insert only if not also "del" exists (then incorrect value) -->
+                        <xsl:variable name="currDelAttr" select="$currNode/@del:*[local-name() = $attName]" />
+                        <xsl:variable name="isNodeInsert" select="$currNode/@diff:insert" />
+
+                        <!-- insert only if not also "del" exists (then it would be incorrectAttributeValue) -->
+                        <!-- insert only if current node is not inserted (then it would be displacedNode) -->
+                        <xsl:if test="not($currDelAttr) and not($isNodeInsert)">
                             <xsl:call-template name="generateXPathAttributeInsert">
                                 <xsl:with-param name="currNode" select="$currNode"/>
                                 <xsl:with-param name="attName" select="$attName"/>
@@ -63,8 +77,12 @@
                     <xsl:variable name="currNode" select="current()"/>
                     <xsl:for-each select="@del:*">
                         <xsl:variable name="attName" select="local-name(.)"/>
-                        <xsl:if test="not($currNode/@ins:*[local-name() = $attName])">
-                            <!-- insert only if not also "ins" exists (then incorrect value) -->
+                        <xsl:variable name="currInsAttr" select="$currNode/@ins:*[local-name() = $attName]" />
+                        <xsl:variable name="isNodeDelete" select="$currNode/@diff:delete" />
+
+                        <!-- insert only if not also "ins" exists (then it would be incorrectAttributeValue) -->
+                        <!-- insert only if current node is not deleted (then it would be displacedNode) -->
+                        <xsl:if test="not($currInsAttr) and not($isNodeDelete)">
                             <xsl:call-template name="generateXPathAttributeDelete">
                                 <xsl:with-param name="currNode" select="$currNode"/>
                                 <xsl:with-param name="attName" select="$attName"/>
@@ -78,12 +96,14 @@
                     <xsl:variable name="currNode" select="current()"/>
                     <xsl:for-each select="@del:*">
                         <xsl:variable name="attName" select="local-name(.)"/>
-                        <xsl:if test="$currNode/@ins:*[local-name() = $attName]"> <!-- insert only if "ins" also exists -->
-                            <xsl:variable name="otherDel" select="//*[name() = $currNode/name() and parent = $currNode/parent]/@del:*[local-name() = $attName]"/>
-                            <xsl:variable name="otherIns" select="//*[name() = $currNode/name() and parent = $currNode/parent]/@ins:*[local-name() = $attName]"/>
+                        <!-- insert only if "ins" also exists, otherwise it is missing or superfluous -->
+                        <xsl:if test="$currNode/@ins:*[local-name() = $attName]">
+                            <!-- find other node with ins and del values switched (new value is equal to this delete value and vice versa) -->
+                            <xsl:variable name="other"
+                                          select="//*[name() = $currNode/name() and ./.. = $currNode/..][@del:*[local-name() = $attName] = $currNode/@*[local-name() = $attName] and @*[local-name() = $attName] = $currNode/@del:*[local-name() = $attName]]"/>
 
-                            <!-- insert only if the same in the opposite direction does not exist, because then it is just different order and order is checked somewhere else -->
-                            <xsl:if test="not($otherDel = $currNode/@*[name() = $attName] and $otherIns)">
+                            <!-- insert only if the values are not equal, otherwise only misplaced node -->
+                            <xsl:if test="not($other) or deep-equal($currNode, $other)">
                                 <xsl:call-template name="generateXPathAttributeValue">
                                     <xsl:with-param name="currNode" select="$currNode"/>
                                     <xsl:with-param name="attName" select="$attName"/>
@@ -210,4 +230,5 @@
             </expectedValue>
         </entry>
     </xsl:template>
+
 </xsl:stylesheet>
