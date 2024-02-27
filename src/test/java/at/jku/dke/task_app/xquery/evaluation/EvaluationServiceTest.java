@@ -26,13 +26,61 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class EvaluationServiceTest {
+
+    @Test
+    void evaluate_invalidLoad() {
+        // Arrange
+        var taskRepository = mock(XQueryTaskRepository.class);
+        var settings = new XQuerySettings("basex", "./basex");
+        var ms = mock(MessageSource.class);
+        var service = new EvaluationService(settings, taskRepository, ms);
+
+        var group = new XQueryTaskGroup(1L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
+        var task = new XQueryTask(1L, BigDecimal.ONE, TaskStatus.APPROVED, group, "return doc('etutor.xml')/db", null);
+        when(taskRepository.findByIdWithTaskGroup(1L)).thenReturn(Optional.of(task));
+        when(ms.getMessage(anyString(), any(), any())).thenAnswer(i -> i.getArgument(0));
+
+        // Act
+        var result = service.evaluate(new SubmitSubmissionDto<>(null, null, 1L, "de", SubmissionMode.SUBMIT, 0,
+            new XQuerySubmissionDto("return doc('some-file.xml')/db")));
+
+        // Assert
+        assertEquals(result.points(), BigDecimal.ZERO);
+        assertEquals(result.generalFeedback(), "syntaxError");
+        assertEquals(result.criteria().size(), 1);
+        assertEquals(result.criteria().getFirst().feedback(), "invalidDocument");
+    }
+
+    @Test
+    void evaluate_invalidSubmissionSyntax() {
+        // Arrange
+        var taskRepository = mock(XQueryTaskRepository.class);
+        var settings = new XQuerySettings("basex", "./basex");
+        var ms = mock(MessageSource.class);
+        var service = new EvaluationService(settings, taskRepository, ms);
+
+        var group = new XQueryTaskGroup(1L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
+        var task = new XQueryTask(1L, BigDecimal.ONE, TaskStatus.APPROVED, group, "return doc('etutor.xml')/db", null);
+        when(taskRepository.findByIdWithTaskGroup(1L)).thenReturn(Optional.of(task));
+        when(ms.getMessage(anyString(), any(), any())).thenAnswer(i -> i.getArgument(0));
+
+        // Act
+        var result = service.evaluate(new SubmitSubmissionDto<>(null, null, 1L, "de", SubmissionMode.SUBMIT, 0,
+            new XQuerySubmissionDto("return doc('etutor.xml')/db@+1")));
+
+        // Assert
+        assertEquals(result.points(), BigDecimal.ZERO);
+        assertEquals(result.generalFeedback(), "syntaxError");
+        assertEquals(result.criteria().size(), 1);
+        assertNotNull(result.criteria().getFirst().feedback());
+    }
 
     @Test
     void evaluate() {
@@ -77,106 +125,6 @@ class EvaluationServiceTest {
         // Assert
         fail("Not implemented yet");
     }
-
-    @Test
-    void diff1_missingNode() throws DiffException, IOException {
-        var submission = """
-            <xquery-result>
-                <root>
-                    <child></child>
-                </root>
-            </xquery-result>
-            """;
-        var solution = """
-            <xquery-result>
-                <root>
-                    <child></child>
-                    <child></child>
-                </root>
-            </xquery-result>
-            """;
-
-        exec(submission, solution, 1);
-    }
-
-    @Test
-    void diff2_superfluousNode() throws DiffException, IOException {
-        var submission = """
-            <xquery-result>
-                <root>
-                    <child></child>
-                    <child></child>
-                </root>
-            </xquery-result>
-            """;
-        var solution = """
-            <xquery-result>
-                <root>
-                    <child></child>
-                </root>
-            </xquery-result>
-            """;
-
-        exec(submission, solution, 2);
-    }
-
-    @Test
-    void diff3_wrongValue() throws DiffException, IOException {
-        var submission = """
-            <xquery-result>
-                <root>
-                    <child>value1</child>
-                    <child>value2</child>
-                </root>
-            </xquery-result>
-            """;
-        var solution = """
-            <xquery-result>
-                <root>
-                    <child>value1</child>
-                    <child>value3</child>
-                </root>
-            </xquery-result>
-            """;
-
-        exec(submission, solution, 3);
-    }
-
-    private void exec(String sub, String sol, int id) throws IOException, DiffException {
-        String diffXml;
-        try (var submissionReader = new StringReader(sub);
-             var solutionReader = new StringReader(sol);
-             var writer = new StringWriter()) {
-            Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.IGNORE, TextGranularity.TEXT));
-
-            diffXml = writer.toString();
-            Files.writeString(Path.of("xml-documents", "diff" + id + ".xml"), diffXml);
-        }
-
-        try (var writer = new StringWriter();
-             var reader = new StringReader(diffXml);
-             var xslt = this.getClass().getClassLoader().getResourceAsStream("transform.xslt")) {
-            Processor processor = new Processor(false);
-            XsltCompiler compiler = processor.newXsltCompiler();
-
-            XsltExecutable stylesheet = compiler.compile(new StreamSource(xslt));
-
-            Serializer out = processor.newSerializer(writer);
-            out.setOutputProperty(Serializer.Property.METHOD, "xml");
-            out.setOutputProperty(Serializer.Property.INDENT, "yes");
-            out.setOutputProperty(Serializer.Property.OMIT_XML_DECLARATION, "yes");
-
-            Xslt30Transformer transformer = stylesheet.load30();
-            transformer.transform(new StreamSource(reader), out);
-
-            String result = writer.toString();
-            Files.writeString(Path.of("xml-documents", "diff-" + id + "-transformed.xml"), result);
-        } catch (IOException | SaxonApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // TODO: is wellformed wenn gleiches Attribut mehrmals vorkommt?
 
     private static final String DIAGNOSE = """
         <db>

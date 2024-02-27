@@ -15,6 +15,19 @@ public final class IncorrectAttributeValueModel {
     }
 
     /**
+     * Creates a new instance of class {@link IncorrectAttributeValueModel}.
+     *
+     * @param path          The path to the node containing the attribute.
+     * @param name          The name of the attribute.
+     * @param expectedValue The expected value.
+     */
+    public IncorrectAttributeValueModel(String path, String name, String expectedValue) {
+        this.path = path;
+        this.name = name;
+        this.expectedValue = expectedValue;
+    }
+
+    /**
      * Gets the path to the node containing the attribute.
      *
      * @return The path to the node containing the attribute.

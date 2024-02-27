@@ -110,4 +110,199 @@ class XQueryTaskTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void getSetMissingNodePenalty(){
+        // Arrange
+        var task = new XQueryTask();
+        final BigDecimal expected = BigDecimal.TEN;
+
+        // Act
+        task.setMissingNodePenalty(expected);
+        final BigDecimal actual = task.getMissingNodePenalty();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetSuperfluousNodePenalty(){
+        // Arrange
+        var task = new XQueryTask();
+        final BigDecimal expected = BigDecimal.TEN;
+
+        // Act
+        task.setSuperfluousNodePenalty(expected);
+        final BigDecimal actual = task.getSuperfluousNodePenalty();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetIncorrectTextPenalty(){
+        // Arrange
+        var task = new XQueryTask();
+        final BigDecimal expected = BigDecimal.TEN;
+
+        // Act
+        task.setIncorrectTextPenalty(expected);
+        final BigDecimal actual = task.getIncorrectTextPenalty();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetDisplacedNodePenalty(){
+        // Arrange
+        var task = new XQueryTask();
+        final BigDecimal expected = BigDecimal.TEN;
+
+        // Act
+        task.setDisplacedNodePenalty(expected);
+        final BigDecimal actual = task.getDisplacedNodePenalty();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetMissingAttributePenalty(){
+        // Arrange
+        var task = new XQueryTask();
+        final BigDecimal expected = BigDecimal.TEN;
+
+        // Act
+        task.setMissingAttributePenalty(expected);
+        final BigDecimal actual = task.getMissingAttributePenalty();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetSuperfluousAttributePenalty(){
+        // Arrange
+        var task = new XQueryTask();
+        final BigDecimal expected = BigDecimal.TEN;
+
+        // Act
+        task.setSuperfluousAttributePenalty(expected);
+        final BigDecimal actual = task.getSuperfluousAttributePenalty();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetIncorrectAttributeValuePenalty(){
+        // Arrange
+        var task = new XQueryTask();
+        final BigDecimal expected = BigDecimal.TEN;
+
+        // Act
+        task.setIncorrectAttributeValuePenalty(expected);
+        final BigDecimal actual = task.getIncorrectAttributeValuePenalty();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetMissingNodeStrategy(){
+        // Arrange
+        var task = new XQueryTask();
+        final GradingStrategy expected = GradingStrategy.KO;
+
+        // Act
+        task.setMissingNodeStrategy(expected);
+        final GradingStrategy actual = task.getMissingNodeStrategy();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetSuperfluousNodeStrategy(){
+        // Arrange
+        var task = new XQueryTask();
+        final GradingStrategy expected = GradingStrategy.KO;
+
+        // Act
+        task.setSuperfluousNodeStrategy(expected);
+        final GradingStrategy actual = task.getSuperfluousNodeStrategy();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetIncorrectTextStrategy(){
+        // Arrange
+        var task = new XQueryTask();
+        final GradingStrategy expected = GradingStrategy.KO;
+
+        // Act
+        task.setIncorrectTextStrategy(expected);
+        final GradingStrategy actual = task.getIncorrectTextStrategy();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetDisplacedNodeStrategy(){
+        // Arrange
+        var task = new XQueryTask();
+        final GradingStrategy expected = GradingStrategy.KO;
+
+        // Act
+        task.setDisplacedNodeStrategy(expected);
+        final GradingStrategy actual = task.getDisplacedNodeStrategy();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetMissingAttributeStrategy(){
+        // Arrange
+        var task = new XQueryTask();
+        final GradingStrategy expected = GradingStrategy.KO;
+
+        // Act
+        task.setMissingAttributeStrategy(expected);
+        final GradingStrategy actual = task.getMissingAttributeStrategy();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetSuperfluousAttributeStrategy(){
+        // Arrange
+        var task = new XQueryTask();
+        final GradingStrategy expected = GradingStrategy.KO;
+
+        // Act
+        task.setSuperfluousAttributeStrategy(expected);
+        final GradingStrategy actual = task.getSuperfluousAttributeStrategy();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getSetIncorrectAttributeValueStrategy(){
+        // Arrange
+        var task = new XQueryTask();
+        final GradingStrategy expected = GradingStrategy.KO;
+
+        // Act
+        task.setIncorrectAttributeValueStrategy(expected);
+        final GradingStrategy actual = task.getIncorrectAttributeValueStrategy();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
 }

@@ -6,8 +6,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
-class AnalysisTest {
+class AnalysisImplTest {
 
     @Test
     void getSubmissionResult() throws AnalysisException {
@@ -29,7 +30,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getSubmissionResult();
 
         // Assert
@@ -56,7 +57,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getSolutionResult();
 
         // Assert
@@ -83,7 +84,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.isSchemaValid();
 
         // Assert
@@ -112,7 +113,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.isSchemaValid();
 
         // Assert
@@ -139,7 +140,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getMissingNodes();
 
         // Assert
@@ -174,7 +175,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getMissingNodes();
 
         // Assert
@@ -203,7 +204,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getSuperfluousNodes();
 
         // Assert
@@ -233,7 +234,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getMissingAttributes();
 
         // Assert
@@ -264,7 +265,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getSuperfluousAttributes();
 
         // Assert
@@ -302,7 +303,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getIncorrectAttributeValues();
 
         // Assert
@@ -340,7 +341,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getIncorrectTextValues();
 
         // Assert
@@ -371,7 +372,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getIncorrectTextValues();
 
         // Assert
@@ -401,7 +402,7 @@ class AnalysisTest {
             """;
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), null);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
         var result = analysis.getIncorrectTextValues();
 
         // Assert
@@ -442,7 +443,7 @@ class AnalysisTest {
         var sorting = List.of("//child", "//child2");
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), sorting);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
         var missingNodes = analysis.getMissingNodes();
         var superfluousNodes = analysis.getSuperfluousNodes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -485,7 +486,7 @@ class AnalysisTest {
         var sorting = List.of("//child");
 
         // Act
-        var analysis = new Analysis(new XQResult(submission), new XQResult(solution), sorting);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
         var missingAttributes = analysis.getMissingAttributes();
         var superfluousAttributes = analysis.getSuperfluousAttributes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -528,6 +529,37 @@ class AnalysisTest {
         var sorting = List.of("//child+2");
 
         // Act & Assert
-        assertThrows(AnalysisException.class, () -> new Analysis(new XQResult(submission), new XQResult(solution), sorting));
+        assertThrows(AnalysisException.class, () -> new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting));
+    }
+
+    @Test
+    void validateSortingExpressions() {
+        // Arrange
+        var submission = """
+            <xquery-result>
+                <root>
+                    <tmp id="1"></tmp>
+                    <child id="1"></child>
+                    <child id="2"></child>
+                    <child2 id="1"></child2>
+                    <child2 id="2"></child2>
+                </root>
+            </xquery-result>
+            """;
+        var solution = """
+            <xquery-result>
+                <root>
+                    <child id="2"></child>
+                    <child id="1"></child>
+                    <child2 id="1"></child2>
+                    <child2 id="2"></child2>
+                    <tmp id="1"></tmp>
+                </root>
+            </xquery-result>
+            """;
+        var sorting = List.of("//something");
+
+        // Act & Assert
+        assertThrows(AnalysisException.class, () -> new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting));
     }
 }

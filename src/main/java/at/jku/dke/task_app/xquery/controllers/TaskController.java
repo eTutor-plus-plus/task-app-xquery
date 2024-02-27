@@ -24,7 +24,7 @@ public class TaskController extends BaseTaskController<XQueryTask, XQueryTaskDto
 
     @Override
     protected XQueryTaskDto mapToDto(XQueryTask task) {
-        return new XQueryTaskDto(task.getSolution(), String.join("\n", task.getSorting()));
+        return new XQueryTaskDto(task);
     }
 
 }

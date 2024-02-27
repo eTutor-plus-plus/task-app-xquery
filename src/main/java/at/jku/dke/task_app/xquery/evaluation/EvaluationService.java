@@ -7,16 +7,19 @@ import at.jku.dke.etutor.task_app.dto.SubmitSubmissionDto;
 import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
 import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
-import at.jku.dke.task_app.xquery.evaluation.analysis.Analysis;
 import at.jku.dke.task_app.xquery.evaluation.analysis.AnalysisException;
+import at.jku.dke.task_app.xquery.evaluation.analysis.AnalysisImpl;
 import at.jku.dke.task_app.xquery.evaluation.analysis.XQResult;
 import at.jku.dke.task_app.xquery.evaluation.execution.*;
+import at.jku.dke.task_app.xquery.evaluation.grading.XQueryGrading;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.HtmlUtils;
 
 import java.math.BigDecimal;
@@ -118,15 +121,17 @@ public class EvaluationService {
                 }
             }
         } catch (Exception ex) {
-            LOG.error("Could not close processor", ex);
-            throw new RuntimeException(ex);
+            LOG.error("Could not close processor for task " + task.getId(), ex);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not execute query.", ex);
         }
 
         // analyze, grade, feedback
         try {
-            var analysis = new Analysis(new XQResult(submissionResult), new XQResult(solutionResult), task.getSorting());
-        } catch (AnalysisException e) {
-            throw new RuntimeException(e);
+            var analysis = new AnalysisImpl(new XQResult(submissionResult), new XQResult(solutionResult), task.getSorting());
+            var grading = new XQueryGrading(task, analysis);
+        } catch (AnalysisException ex) {
+            LOG.error("Could not analyze query result for task " + task.getId(), ex);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not analyze query result.", ex);
         }
         criteria.add(new CriterionDto(
             "Ausgabe",

@@ -15,6 +15,19 @@ public class AttributeModel {
     }
 
     /**
+     * Creates a new instance of class {@link AttributeModel}.
+     *
+     * @param path  The path to the parent of the node containing the attribute.
+     * @param name  The name of the attribute.
+     * @param value The attribute value.
+     */
+    public AttributeModel(String path, String name, String value) {
+        this.path = path;
+        this.name = name;
+        this.value = value;
+    }
+
+    /**
      * Gets the path to the parent of the node containing the attribute.
      *
      * @return The path to the parent of the node containing the attribute.

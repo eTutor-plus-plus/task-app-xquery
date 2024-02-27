@@ -5,6 +5,7 @@ import at.jku.dke.etutor.task_app.dto.ModifyTaskDto;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
 import at.jku.dke.task_app.xquery.ClientSetupExtension;
 import at.jku.dke.task_app.xquery.DatabaseSetupExtension;
+import at.jku.dke.task_app.xquery.data.entities.GradingStrategy;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
@@ -22,8 +23,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith({DatabaseSetupExtension.class, ClientSetupExtension.class})
@@ -44,6 +46,7 @@ class TaskControllerTest {
     @BeforeEach
     void initDb() {
         this.repository.deleteAll();
+        this.groupRepository.deleteAll();
 
         var group = this.groupRepository.save(new XQueryTaskGroup(1L, TaskStatus.APPROVED, "<db><solution>1</solution></db>", "<db><solution>2</solution></db>"));
         this.taskGroupId = group.getId();
@@ -297,6 +300,21 @@ class TaskControllerTest {
     void mapToDto() {
         // Arrange
         var task = new XQueryTask("//newSolution", List.of("//newSorting"));
+        task.setMissingNodePenalty(BigDecimal.ONE);
+        task.setMissingNodeStrategy(GradingStrategy.KO);
+        task.setSuperfluousNodePenalty(BigDecimal.TWO);
+        task.setSuperfluousNodeStrategy(GradingStrategy.GROUP);
+        task.setDisplacedNodePenalty(BigDecimal.ZERO);
+        task.setDisplacedNodeStrategy(GradingStrategy.EACH);
+        task.setIncorrectTextPenalty(BigDecimal.valueOf(100));
+        task.setIncorrectTextStrategy(GradingStrategy.EACH);
+        task.setMissingAttributePenalty(BigDecimal.valueOf(200));
+        task.setMissingAttributeStrategy(GradingStrategy.EACH);
+        task.setSuperfluousAttributePenalty(BigDecimal.valueOf(300));
+        task.setSuperfluousAttributeStrategy(GradingStrategy.EACH);
+        task.setIncorrectAttributeValuePenalty(BigDecimal.valueOf(400));
+        task.setIncorrectAttributeValueStrategy(GradingStrategy.EACH);
+
 
         // Act
         var result = new TaskController(null).mapToDto(task);
@@ -304,6 +322,20 @@ class TaskControllerTest {
         // Assert
         assertEquals("//newSolution", result.solution());
         assertEquals("//newSorting", result.sorting());
+        assertEquals(BigDecimal.ONE, result.missingNodePenalty());
+        assertEquals(GradingStrategy.KO, result.missingNodeStrategy());
+        assertEquals(BigDecimal.TWO, result.superfluousNodePenalty());
+        assertEquals(GradingStrategy.GROUP, result.superfluousNodeStrategy());
+        assertEquals(BigDecimal.ZERO, result.displacedNodePenalty());
+        assertEquals(GradingStrategy.EACH, result.displacedNodeStrategy());
+        assertEquals(BigDecimal.valueOf(100), result.incorrectTextPenalty());
+        assertEquals(GradingStrategy.EACH, result.incorrectTextStrategy());
+        assertEquals(BigDecimal.valueOf(200), result.missingAttributePenalty());
+        assertEquals(GradingStrategy.EACH, result.missingAttributeStrategy());
+        assertEquals(BigDecimal.valueOf(300), result.superfluousAttributePenalty());
+        assertEquals(GradingStrategy.EACH, result.superfluousAttributeStrategy());
+        assertEquals(BigDecimal.valueOf(400), result.incorrectAttributeValuePenalty());
+        assertEquals(GradingStrategy.EACH, result.incorrectAttributeValueStrategy());
     }
 
 }

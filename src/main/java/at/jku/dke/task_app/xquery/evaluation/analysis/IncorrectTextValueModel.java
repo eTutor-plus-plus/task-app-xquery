@@ -14,6 +14,17 @@ public final class IncorrectTextValueModel {
     }
 
     /**
+     * Creates a new instance of class {@link IncorrectTextValueModel}.
+     *
+     * @param path          The path to the node.
+     * @param expectedValue The expected value.
+     */
+    public IncorrectTextValueModel(String path, String expectedValue) {
+        this.path = path;
+        this.expectedValue = expectedValue;
+    }
+
+    /**
      * Gets the path to the node.
      *
      * @return The path to the node.
