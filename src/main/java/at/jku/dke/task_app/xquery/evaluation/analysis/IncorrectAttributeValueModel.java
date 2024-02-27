@@ -80,4 +80,9 @@ public final class IncorrectAttributeValueModel {
     public void setExpectedValue(String expectedValue) {
         this.expectedValue = expectedValue;
     }
+
+    @Override
+    public String toString() {
+        return this.path + "@" + this.name + "=\"" + this.expectedValue + "\"";
+    }
 }

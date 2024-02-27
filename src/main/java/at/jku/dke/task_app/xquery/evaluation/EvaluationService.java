@@ -12,6 +12,7 @@ import at.jku.dke.task_app.xquery.evaluation.analysis.AnalysisImpl;
 import at.jku.dke.task_app.xquery.evaluation.analysis.XQResult;
 import at.jku.dke.task_app.xquery.evaluation.execution.*;
 import at.jku.dke.task_app.xquery.evaluation.grading.XQueryGrading;
+import at.jku.dke.task_app.xquery.evaluation.report.XQueryReport;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.HtmlUtils;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -117,7 +117,7 @@ public class EvaluationService {
                     solutionResult = processor.executeQuery(task.getSolution(), xmlDocument);
                 } catch (XQueryException ex) {
                     LOG.error("Error while executing query", ex);
-                    throw new RuntimeException(ex);
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not execute solution query.", ex);
                 }
             }
         } catch (Exception ex) {
@@ -129,15 +129,11 @@ public class EvaluationService {
         try {
             var analysis = new AnalysisImpl(new XQResult(submissionResult), new XQResult(solutionResult), task.getSorting());
             var grading = new XQueryGrading(task, analysis);
+            var report = new XQueryReport(this.messageSource, locale, submission.mode(), submission.feedbackLevel(), analysis, grading);
+            return new GradingDto(task.getMaxPoints(), grading.getPoints(), report.getGeneralFeedback(), report.getCriteria());
         } catch (AnalysisException ex) {
             LOG.error("Could not analyze query result for task " + task.getId(), ex);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not analyze query result.", ex);
         }
-        criteria.add(new CriterionDto(
-            "Ausgabe",
-            null,
-            false,
-            "<pre>" + HtmlUtils.htmlEscape(submissionResult) + "</pre>"));
-        return new GradingDto(task.getMaxPoints(), points, "", criteria);
     }
 }

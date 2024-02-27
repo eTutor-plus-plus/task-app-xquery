@@ -59,4 +59,9 @@ public final class IncorrectTextValueModel {
     public void setExpectedValue(String expectedValue) {
         this.expectedValue = expectedValue;
     }
+
+    @Override
+    public String toString() {
+        return this.path + ": " + this.expectedValue;
+    }
 }

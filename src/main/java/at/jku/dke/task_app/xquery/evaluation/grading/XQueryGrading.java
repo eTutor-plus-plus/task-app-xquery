@@ -88,6 +88,16 @@ public class XQueryGrading {
     }
 
     /**
+     * Gets the details of the grading for a specific category.
+     *
+     * @param category The category name.
+     * @return The details, if present.
+     */
+    public Optional<GradingEntry> getDetails(String category) {
+        return this.details.stream().filter(x -> x.errorCategory().equals(category)).findFirst();
+    }
+
+    /**
      * Calculates all minus points with regard to the configured penalties and grading strategies.
      *
      * @param analysis The analysis object containing information about the analyzed query and detected errors.
