@@ -5,9 +5,11 @@ import at.jku.dke.etutor.task_app.dto.SubmissionMode;
 import at.jku.dke.task_app.xquery.evaluation.analysis.Analysis;
 import at.jku.dke.task_app.xquery.evaluation.grading.GradingEntry;
 import at.jku.dke.task_app.xquery.evaluation.grading.XQueryGrading;
+import org.codelibs.jhighlight.renderer.XhtmlRendererFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.web.util.HtmlUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -100,7 +102,7 @@ public class XQueryReport {
                 this.messageSource.getMessage("criterium.result", null, locale),
                 null,
                 analysis.isCorrect(),
-                "<div style=\"font-family: monospace;\">" + HtmlUtils.htmlEscape(this.analysis.getSubmissionResult().getRawResult()) + "</div>"
+                highlightCode(this.analysis.getSubmissionResult().getRawResult())
             ));
         }
 
@@ -157,6 +159,14 @@ public class XQueryReport {
                 .append("</pre></li>");
         }
         return sb.append("</ul>").toString();
+    }
+
+    private static String highlightCode(String code) {
+        try {
+            return XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XML).highlight("result.xml", code, "UTF-8", true);
+        } catch (IOException e) {
+            return "<pre>" + HtmlUtils.htmlEscape(code) + "</pre>";
+        }
     }
 
 }
