@@ -35,7 +35,22 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
     protected XQueryTask createTask(long id, ModifyTaskDto<ModifyXQueryTaskDto> modifyTaskDto) {
         if (!modifyTaskDto.taskType().equals("xquery"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task type.");
-        return new XQueryTask(modifyTaskDto.additionalData().solution(), stringToList(modifyTaskDto.additionalData().sorting()));
+        var task = new XQueryTask(modifyTaskDto.additionalData().solution(), stringToList(modifyTaskDto.additionalData().sorting()));
+        task.setMissingNodePenalty(modifyTaskDto.additionalData().missingNodePenalty());
+        task.setMissingNodeStrategy(modifyTaskDto.additionalData().missingNodeStrategy());
+        task.setSuperfluousNodePenalty(modifyTaskDto.additionalData().superfluousNodePenalty());
+        task.setSuperfluousNodeStrategy(modifyTaskDto.additionalData().superfluousNodeStrategy());
+        task.setDisplacedNodePenalty(modifyTaskDto.additionalData().displacedNodePenalty());
+        task.setDisplacedNodeStrategy(modifyTaskDto.additionalData().displacedNodeStrategy());
+        task.setMissingAttributePenalty(modifyTaskDto.additionalData().missingAttributePenalty());
+        task.setMissingAttributeStrategy(modifyTaskDto.additionalData().missingAttributeStrategy());
+        task.setSuperfluousAttributePenalty(modifyTaskDto.additionalData().superfluousAttributePenalty());
+        task.setSuperfluousAttributeStrategy(modifyTaskDto.additionalData().superfluousAttributeStrategy());
+        task.setIncorrectTextPenalty(modifyTaskDto.additionalData().incorrectTextPenalty());
+        task.setIncorrectTextStrategy(modifyTaskDto.additionalData().incorrectTextStrategy());
+        task.setIncorrectAttributeValuePenalty(modifyTaskDto.additionalData().incorrectAttributeValuePenalty());
+        task.setIncorrectAttributeValueStrategy(modifyTaskDto.additionalData().incorrectAttributeValueStrategy());
+        return task;
     }
 
     @Override
@@ -44,6 +59,20 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task type.");
         task.setSolution(modifyTaskDto.additionalData().solution());
         task.setSorting(stringToList(modifyTaskDto.additionalData().sorting()));
+        task.setMissingNodePenalty(modifyTaskDto.additionalData().missingNodePenalty());
+        task.setMissingNodeStrategy(modifyTaskDto.additionalData().missingNodeStrategy());
+        task.setSuperfluousNodePenalty(modifyTaskDto.additionalData().superfluousNodePenalty());
+        task.setSuperfluousNodeStrategy(modifyTaskDto.additionalData().superfluousNodeStrategy());
+        task.setDisplacedNodePenalty(modifyTaskDto.additionalData().displacedNodePenalty());
+        task.setDisplacedNodeStrategy(modifyTaskDto.additionalData().displacedNodeStrategy());
+        task.setMissingAttributePenalty(modifyTaskDto.additionalData().missingAttributePenalty());
+        task.setMissingAttributeStrategy(modifyTaskDto.additionalData().missingAttributeStrategy());
+        task.setSuperfluousAttributePenalty(modifyTaskDto.additionalData().superfluousAttributePenalty());
+        task.setSuperfluousAttributeStrategy(modifyTaskDto.additionalData().superfluousAttributeStrategy());
+        task.setIncorrectTextPenalty(modifyTaskDto.additionalData().incorrectTextPenalty());
+        task.setIncorrectTextStrategy(modifyTaskDto.additionalData().incorrectTextStrategy());
+        task.setIncorrectAttributeValuePenalty(modifyTaskDto.additionalData().incorrectAttributeValuePenalty());
+        task.setIncorrectAttributeValueStrategy(modifyTaskDto.additionalData().incorrectAttributeValueStrategy());
     }
 
     @Override
