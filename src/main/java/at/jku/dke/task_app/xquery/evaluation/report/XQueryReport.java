@@ -162,8 +162,17 @@ public class XQueryReport {
     }
 
     private static String highlightCode(String code) {
+        String css = """
+            <style>
+            .xml {font-family: monospace;}
+            .xml_tag_symbols {color: #000000;}
+            .xml_tag_name {color: #008080;}
+            .xml_plain {color: #000000;}
+            .xml_attribute_value {color: #a31515;}
+            </style>
+            """;
         try {
-            return XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XML).highlight("result.xml", code, "UTF-8", true);
+            return css + "<div class=\"xml\">" + XhtmlRendererFactory.getRenderer(XhtmlRendererFactory.XML).highlight("result.xml", code, "UTF-8", true) + "</div>";
         } catch (IOException e) {
             return "<pre>" + HtmlUtils.htmlEscape(code) + "</pre>";
         }
