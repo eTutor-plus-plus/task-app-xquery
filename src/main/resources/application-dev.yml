@@ -29,3 +29,8 @@ clients:
       key: plag-check-key
       roles:
         - READ_SUBMISSION
+
+# XQuery
+xquery:
+  executor: basex
+  xml-directory: ./basex

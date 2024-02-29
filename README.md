@@ -29,6 +29,7 @@ docker run -p 8090:8081 \
   -e CLIENTS_API_KEYS_2_NAME=plagiarism-checker \
   -e CLIENTS_API_KEYS_2_KEY=adf455jfil45646 \
   -e CLIENTS_API_KEYS_2_ROLES_0=READ_SUBMISSION \
+  -e XQUERY_EXECUTOR=basex
   etutorplusplus/task-app-xquery
 ```
 
@@ -60,6 +61,7 @@ services:
             CLIENTS_API_KEYS_2_NAME: plagiarism-checker
             CLIENTS_API_KEYS_2_KEY: adf455jfil45646
             CLIENTS_API_KEYS_2_ROLES_0: READ_SUBMISSION
+            XQUERY_EXECUTOR: basex
 ```
 
 ### Environment Variables
@@ -67,20 +69,22 @@ services:
 In production environment, the application requires two database users:
 
 * A database administrator user which has the permission to create the tables.
-* A JPA user which has read/write access (`SELECT, INSERT, UPDATE, DELETE, TRUNCATE`) to the database tables (see `./docker/create_user.sh` for example user creation statement).
+* A JPA user which has read/write access (`SELECT, INSERT, UPDATE, DELETE, TRUNCATE`) to the database tables.
 
 > In development environment, one user will be used for both.
 
 The users must be configured via environment variables. The clients have to be configured via environment variables as well (`X`/`Y` stands for a 0-based index).
 
-| Variable                     | Description                                      |
-|------------------------------|--------------------------------------------------|
-| `SERVER_PORT`                | The server port.                                 |
-| `SPRING_DATASOURCE_URL`      | JDBC-URL to the database                         |
-| `SPRING_DATASOURCE_USERNAME` | The username of the JPA user.                    |
-| `SPRING_DATASOURCE_PASSWORD` | The password of the JPA user.                    |
-| `SPRING_FLYWAY_USER`         | The username of the database administrator user. |
-| `SPRING_FLYWAY_PASSWORD`     | The password of the database administrator user. |
-| `CLIENTS_API_KEYS_X_NAME`    | The name of the client.                          |
-| `CLIENTS_API_KEYS_X_KEY`     | The API key of the client.                       |
-| `CLIENTS_API_KEYS_X_ROLES_Y` | The role of the client.                          |
+| Variable                     | Description                                                      |
+|------------------------------|------------------------------------------------------------------|
+| `SERVER_PORT`                | The server port.                                                 |
+| `SPRING_DATASOURCE_URL`      | JDBC-URL to the database                                         |
+| `SPRING_DATASOURCE_USERNAME` | The username of the JPA user.                                    |
+| `SPRING_DATASOURCE_PASSWORD` | The password of the JPA user.                                    |
+| `SPRING_FLYWAY_USER`         | The username of the database administrator user.                 |
+| `SPRING_FLYWAY_PASSWORD`     | The password of the database administrator user.                 |
+| `CLIENTS_API_KEYS_X_NAME`    | The name of the client.                                          |
+| `CLIENTS_API_KEYS_X_KEY`     | The API key of the client.                                       |
+| `CLIENTS_API_KEYS_X_ROLES_Y` | The role of the client.                                          |
+| `XQUERY_EXECUTOR`            | The executor used to execute XQuery (either `basex´ or `saxon`). |
+| `XQUERY_XML_DIRECTORY`       | The directory where the executor stores temporary files.         |

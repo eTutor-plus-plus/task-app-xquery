@@ -44,3 +44,8 @@ spring:
 #      key: TBD
 #      roles:
 #       - READ_SUBMISSION
+#
+## XQuery
+#xquery:
+#  executor: basex
+#  xml-directory: ./basex

@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>at.jku.dke.etutor</groupId>
     <artifactId>task-app-xquery</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.0</version>
 
     <name>eTutor Task-App: XQuery</name>
     <description>eTutor Task-App for task type "xquery"</description>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>at.jku.dke.etutor</groupId>
             <artifactId>etutor-task-app-starter</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
         </dependency>
 
         <!-- Spring -->
@@ -55,6 +55,33 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- Other -->
+        <dependency>
+            <groupId>org.sqids</groupId>
+            <artifactId>sqids</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+            <version>12.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.basex</groupId>
+            <artifactId>basex</artifactId>
+            <version>10.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pageseeder.diffx</groupId>
+            <artifactId>pso-diffx</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codelibs</groupId>
+            <artifactId>jhighlight</artifactId>
+            <version>1.1.0</version>
         </dependency>
 
         <!-- Spring Dev -->

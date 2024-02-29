@@ -85,3 +85,7 @@ management:
           - metrics
           - livenessstate
           - readinessstate
+
+# XQuery
+xquery:
+  xmlFilesDirectory: ./xml-documents
