@@ -123,7 +123,8 @@ class EvaluationServiceTest {
                  </mietstatistik>""")));
 
         // Assert
-        fail("Not implemented yet");
+        assertEquals(BigDecimal.ZERO, result.points());
+        assertEquals(5, result.criteria().size());
     }
 
     private static final String DIAGNOSE = """

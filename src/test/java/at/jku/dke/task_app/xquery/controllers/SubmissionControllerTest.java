@@ -87,7 +87,7 @@ class SubmissionControllerTest {
             .body("grading.maxPoints", equalTo(2f))
             .body("grading.points", equalTo(0))
             .body("grading.generalFeedback", any(String.class))
-            .body("grading.criteria", hasSize(1));
+            .body("grading.criteria", hasSize(3));
     }
 
     @Test

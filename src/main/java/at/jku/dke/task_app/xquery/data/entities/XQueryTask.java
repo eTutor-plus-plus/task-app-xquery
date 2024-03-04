@@ -88,6 +88,7 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
      * Creates a new instance of class {@link XQueryTask}.
      */
     public XQueryTask() {
+        this.setDefaultGradingValues();
     }
 
     /**
@@ -99,6 +100,7 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
     public XQueryTask(String solution, List<String> sorting) {
         this.solution = solution;
         this.sorting = sorting;
+        this.setDefaultGradingValues();
     }
 
     /**
@@ -114,6 +116,7 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
         super(maxPoints, status, taskGroup);
         this.solution = solution;
         this.sorting = sorting;
+        this.setDefaultGradingValues();
     }
 
     /**
@@ -130,6 +133,7 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
         super(id, maxPoints, status, taskGroup);
         this.solution = solution;
         this.sorting = sorting;
+        this.setDefaultGradingValues();
     }
 
     /**
@@ -420,5 +424,23 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
      */
     public void setIncorrectAttributeValueStrategy(GradingStrategy incorrectAttributeValueStrategy) {
         this.incorrectAttributeValueStrategy = incorrectAttributeValueStrategy;
+    }
+
+    private void setDefaultGradingValues(){
+        this.missingNodePenalty = BigDecimal.ZERO;
+        this.superfluousNodePenalty = BigDecimal.ZERO;
+        this.incorrectTextPenalty = BigDecimal.ZERO;
+        this.displacedNodePenalty = BigDecimal.ZERO;
+        this.missingAttributePenalty = BigDecimal.ZERO;
+        this.superfluousAttributePenalty = BigDecimal.ZERO;
+        this.incorrectAttributeValuePenalty = BigDecimal.ZERO;
+
+        this.missingNodeStrategy = GradingStrategy.KO;
+        this.superfluousNodeStrategy = GradingStrategy.KO;
+        this.incorrectTextStrategy = GradingStrategy.KO;
+        this.displacedNodeStrategy = GradingStrategy.KO;
+        this.missingAttributeStrategy = GradingStrategy.KO;
+        this.superfluousAttributeStrategy = GradingStrategy.KO;
+        this.incorrectAttributeValueStrategy = GradingStrategy.KO;
     }
 }
