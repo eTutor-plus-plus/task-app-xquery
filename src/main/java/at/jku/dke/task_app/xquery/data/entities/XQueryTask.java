@@ -426,7 +426,7 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
         this.incorrectAttributeValueStrategy = incorrectAttributeValueStrategy;
     }
 
-    private void setDefaultGradingValues(){
+    private void setDefaultGradingValues() {
         this.missingNodePenalty = BigDecimal.ZERO;
         this.superfluousNodePenalty = BigDecimal.ZERO;
         this.incorrectTextPenalty = BigDecimal.ZERO;

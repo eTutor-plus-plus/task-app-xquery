@@ -46,6 +46,12 @@ public record ModifyXQueryTaskDto(@Schema(example = "return for $b in //bezirke 
                                   @NotNull @PositiveOrZero BigDecimal incorrectAttributeValuePenalty,
                                   @NotNull GradingStrategy incorrectAttributeValueStrategy
 ) implements Serializable {
+    /**
+     * Creates a new instance of class {@link ModifyXQueryTaskDto}.
+     *
+     * @param solution The solution.
+     * @param sorting  The sorting.
+     */
     public ModifyXQueryTaskDto(@NotEmpty String solution, String sorting) {
         this(solution, sorting, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO,
             GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO);

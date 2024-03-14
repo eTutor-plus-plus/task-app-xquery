@@ -12,6 +12,6 @@ public class OpenApiConfig extends BaseOpenApiConfig {
      * Creates a new instance of class {@link OpenApiConfig}.
      */
     public OpenApiConfig() {
-        super("eTutor - XQuery API", "API for tasks of type <code>xquery</code>", "dev");
+        super("eTutor - XQuery API", "API for tasks of type <code>xquery</code>", OpenApiConfig.class.getPackage().getImplementationVersion());
     }
 }

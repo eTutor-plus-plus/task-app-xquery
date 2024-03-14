@@ -1,11 +1,11 @@
-${AnsiColor.RED}    _______    _              ${AnsiColor.BLACK}__   ______
-${AnsiColor.RED}   |__   __|  | |             ${AnsiColor.BLACK}\ \ / / __ \
-${AnsiColor.RED}   ___| |_   _| |_ ___  _ __  ${AnsiColor.BLACK} \ V / |  | |_   _  ___ _ __ _   _
-${AnsiColor.RED}  / _ \ | | | | __/ _ \| '__| ${AnsiColor.BLACK}  > <| |  | | | | |/ _ \ '__| | | |
-${AnsiColor.RED} |  __/ | |_| | || (_) | |    ${AnsiColor.BLACK} / . \ |__| | |_| |  __/ |  | |_| |
-${AnsiColor.RED}  \___|_|\__,_|\__\___/|_|    ${AnsiColor.BLACK}/_/ \_\___\_\\__,_|\___|_|   \__, |
-${AnsiColor.RED}                              ${AnsiColor.BLACK}                              __/ |
-${AnsiColor.RED}                              ${AnsiColor.BLACK}                              |___/
+${AnsiColor.RED}    _______    _              ${AnsiColor.DEFAULT}__   ______
+${AnsiColor.RED}   |__   __|  | |             ${AnsiColor.DEFAULT}\ \ / / __ \
+${AnsiColor.RED}   ___| |_   _| |_ ___  _ __  ${AnsiColor.DEFAULT} \ V / |  | |_   _  ___ _ __ _   _
+${AnsiColor.RED}  / _ \ | | | | __/ _ \| '__| ${AnsiColor.DEFAULT}  > <| |  | | | | |/ _ \ '__| | | |
+${AnsiColor.RED} |  __/ | |_| | || (_) | |    ${AnsiColor.DEFAULT} / . \ |__| | |_| |  __/ |  | |_| |
+${AnsiColor.RED}  \___|_|\__,_|\__\___/|_|    ${AnsiColor.DEFAULT}/_/ \_\___\_\\__,_|\___|_|   \__, |
+${AnsiColor.RED}                              ${AnsiColor.DEFAULT}                              __/ |
+${AnsiColor.RED}                              ${AnsiColor.DEFAULT}                              |___/
 
-${application.title} ${AnsiColor.GREEN}${application.version}${AnsiColor.BLACK}
-${AnsiColor.BRIGHT_BLACK}Powered by Spring Boot ${spring-boot.version}${AnsiColor.BLACK}
+${application.title} ${AnsiColor.GREEN}${application.version}${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_BLACK}Powered by Spring Boot ${spring-boot.version}${AnsiColor.DEFAULT}

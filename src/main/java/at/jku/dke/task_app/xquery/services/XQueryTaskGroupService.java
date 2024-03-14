@@ -3,7 +3,6 @@ package at.jku.dke.task_app.xquery.services;
 import at.jku.dke.etutor.task_app.dto.ModifyTaskGroupDto;
 import at.jku.dke.etutor.task_app.dto.TaskGroupModificationResponseDto;
 import at.jku.dke.etutor.task_app.services.BaseTaskGroupService;
-import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;

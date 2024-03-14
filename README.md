@@ -6,7 +6,7 @@ This application provides a REST-interface for following task type: xquery.
 
 In development environment, the API documentation is available at http://localhost:8081/docs.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Wiki](https://github.com/eTutor-plus-plus/task-app-datalog/wiki) for details.
 
 ## Docker
 
@@ -86,5 +86,5 @@ The users must be configured via environment variables. The clients have to be c
 | `CLIENTS_API_KEYS_X_NAME`    | The name of the client.                                          |
 | `CLIENTS_API_KEYS_X_KEY`     | The API key of the client.                                       |
 | `CLIENTS_API_KEYS_X_ROLES_Y` | The role of the client.                                          |
-| `XQUERY_EXECUTOR`            | The executor used to execute XQuery (either `basex´ or `saxon`). |
+| `XQUERY_EXECUTOR`            | The executor used to execute XQuery (either `basex` or `saxon`). |
 | `XQUERY_XML_DIRECTORY`       | The directory where the executor stores temporary files.         |
