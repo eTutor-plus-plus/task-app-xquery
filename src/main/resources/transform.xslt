@@ -13,7 +13,6 @@
             <missingNodes>
                 <xsl:for-each select="//*[@diff:insert='true']">
                     <!-- insert only if no other element at the same level diff:delete exists -->
-                    <!-- TODO: check content and attributes?? e.g. text() = current()/text() -->
                     <xsl:variable name="otherDel" select="//*[name() = current()/name() and ./.. = current()/..]/@diff:delete"/>
                     <xsl:if test="not($otherDel)">
                         <xsl:call-template name="generateXPathElement"/>
@@ -23,7 +22,6 @@
             <superfluousNodes>
                 <xsl:for-each select="//*[@diff:delete='true']">
                     <!-- insert only if no other element at the same level with diff:insert exists -->
-                    <!-- TODO: check content and attributes?? e.g. text() = current()/text() -->
                     <xsl:variable name="otherIns" select="//*[name() = current()/name() and ./.. = current()/..]/@diff:insert"/>
                     <xsl:if test="not($otherIns)">
                         <xsl:call-template name="generateXPathElement"/>
@@ -37,7 +35,7 @@
                     <xsl:variable name="currDel" select="$currNode/diff:del"/>
 
                     <xsl:choose>
-                        <!-- insert only if not both ins and del with same content exist -->
+                        <!-- insert only if not both ins and del with same content exist, then it would be just at another order -->
                         <xsl:when test="$currIns and $currDel">
                             <xsl:variable name="otherDel" select="//*[name() = $currNode/name() and ./.. = $currNode/..]/diff:del[text() = $currIns/text()]"/>
                             <xsl:variable name="otherIns" select="//*[name() = $currNode/name() and ./.. = $currNode/..]/diff:ins[text() = $currDel/text()]"/>
@@ -46,7 +44,11 @@
                             </xsl:if>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:call-template name="generateXPathElementText"/>
+                            <!-- Insert only if parent does not have attribute diff:insert -->
+                            <xsl:variable name="parentIns" select="$currNode/ancestor-or-self::*[@diff:insert='true']"/>
+                            <xsl:if test="not($parentIns)">
+                                <xsl:call-template name="generateXPathElementText"/>
+                            </xsl:if>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:for-each>
@@ -58,8 +60,8 @@
                     <xsl:variable name="currNode" select="current()"/>
                     <xsl:for-each select="@ins:*">
                         <xsl:variable name="attName" select="local-name(.)"/>
-                        <xsl:variable name="currDelAttr" select="$currNode/@del:*[local-name() = $attName]" />
-                        <xsl:variable name="isNodeInsert" select="$currNode/@diff:insert" />
+                        <xsl:variable name="currDelAttr" select="$currNode/@del:*[local-name() = $attName]"/>
+                        <xsl:variable name="isNodeInsert" select="$currNode/@diff:insert"/>
 
                         <!-- insert only if not also "del" exists (then it would be incorrectAttributeValue) -->
                         <!-- insert only if current node is not inserted (then it would be displacedNode) -->
@@ -77,8 +79,8 @@
                     <xsl:variable name="currNode" select="current()"/>
                     <xsl:for-each select="@del:*">
                         <xsl:variable name="attName" select="local-name(.)"/>
-                        <xsl:variable name="currInsAttr" select="$currNode/@ins:*[local-name() = $attName]" />
-                        <xsl:variable name="isNodeDelete" select="$currNode/@diff:delete" />
+                        <xsl:variable name="currInsAttr" select="$currNode/@ins:*[local-name() = $attName]"/>
+                        <xsl:variable name="isNodeDelete" select="$currNode/@diff:delete"/>
 
                         <!-- insert only if not also "ins" exists (then it would be incorrectAttributeValue) -->
                         <!-- insert only if current node is not deleted (then it would be displacedNode) -->

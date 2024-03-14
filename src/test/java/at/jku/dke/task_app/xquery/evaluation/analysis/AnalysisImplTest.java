@@ -382,6 +382,37 @@ class AnalysisImplTest {
     }
 
     @Test
+    void compare_incorrectTextValueMissingNode() throws AnalysisException {
+        // Arrange
+        var submission = """
+            <xquery-result>
+                <root>
+                    <child>3</child>
+                </root>
+            </xquery-result>
+            """;
+        var solution = """
+            <xquery-result>
+                <root>
+                    <child>1</child>
+                    <child>3</child>
+                </root>
+            </xquery-result>
+            """;
+
+        // Act
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), null);
+        var result = analysis.getMissingNodes();
+        var resultTextValues = analysis.getIncorrectTextValues();
+
+        // Assert
+        assertThat(result)
+            .hasSize(1);
+        assertThat(resultTextValues)
+            .isEmpty();
+    }
+
+    @Test
     void compare_incorrectTextValueRemove() throws AnalysisException {
         // Arrange
         var submission = """

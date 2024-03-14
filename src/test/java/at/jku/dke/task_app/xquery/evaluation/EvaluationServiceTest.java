@@ -124,7 +124,7 @@ class EvaluationServiceTest {
 
         // Assert
         assertEquals(BigDecimal.ZERO, result.points());
-        assertEquals(5, result.criteria().size());
+        assertEquals(4, result.criteria().size());
     }
 
     private static final String DIAGNOSE = """

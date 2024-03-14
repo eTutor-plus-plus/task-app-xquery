@@ -383,7 +383,7 @@ public class AnalysisImpl implements Analysis {
              var solutionReader = new StringReader(this.solutionResult.getResultDocumentRaw());
              var writer = new StringWriter()) {
             Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.IGNORE, TextGranularity.TEXT));
-
+//            Files.writeString(java.nio.file.Path.of("diff.xml"), writer.toString()); // write to file for debugging
             return writer.toString();
         } catch (IOException | DiffException ex) {
             LOG.error("Could not generate diff.", ex);
@@ -416,6 +416,7 @@ public class AnalysisImpl implements Analysis {
             transformer.transform(new StreamSource(reader), out);
 
             String result = writer.toString();
+//            Files.writeString(java.nio.file.Path.of("analysis.xml"), writer.toString()); // write to file for debugging
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             return builder.parse(new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
         } catch (IOException | SaxonApiException ex) {
