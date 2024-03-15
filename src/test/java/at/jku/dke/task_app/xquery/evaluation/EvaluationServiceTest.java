@@ -8,22 +8,10 @@ import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
 import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
-import net.sf.saxon.s9api.*;
 import org.junit.jupiter.api.Test;
-import org.pageseeder.diffx.DiffException;
-import org.pageseeder.diffx.Main;
-import org.pageseeder.diffx.config.DiffConfig;
-import org.pageseeder.diffx.config.TextGranularity;
-import org.pageseeder.diffx.config.WhiteSpaceProcessing;
 import org.springframework.context.MessageSource;
 
-import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,7 +28,7 @@ class EvaluationServiceTest {
         var taskRepository = mock(XQueryTaskRepository.class);
         var settings = new XQuerySettings("basex", "./basex");
         var ms = mock(MessageSource.class);
-        var service = new EvaluationService(settings, taskRepository, ms);
+        var service = new EvaluationServiceImpl(settings, taskRepository, ms);
 
         var group = new XQueryTaskGroup(1L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
         var task = new XQueryTask(1L, BigDecimal.ONE, TaskStatus.APPROVED, group, "return doc('etutor.xml')/db", null);
@@ -64,7 +52,7 @@ class EvaluationServiceTest {
         var taskRepository = mock(XQueryTaskRepository.class);
         var settings = new XQuerySettings("basex", "./basex");
         var ms = mock(MessageSource.class);
-        var service = new EvaluationService(settings, taskRepository, ms);
+        var service = new EvaluationServiceImpl(settings, taskRepository, ms);
 
         var group = new XQueryTaskGroup(1L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
         var task = new XQueryTask(1L, BigDecimal.ONE, TaskStatus.APPROVED, group, "return doc('etutor.xml')/db", null);
@@ -88,7 +76,7 @@ class EvaluationServiceTest {
         var taskRepository = mock(XQueryTaskRepository.class);
         var settings = new XQuerySettings("basex", "./basex");
         var ms = mock(MessageSource.class);
-        var service = new EvaluationService(settings, taskRepository, ms);
+        var service = new EvaluationServiceImpl(settings, taskRepository, ms);
 
         var group = new XQueryTaskGroup(3L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
         var task = new XQueryTask(2L, BigDecimal.ONE, TaskStatus.APPROVED, group, """

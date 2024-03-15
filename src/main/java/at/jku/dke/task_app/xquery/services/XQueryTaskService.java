@@ -1,13 +1,14 @@
 package at.jku.dke.task_app.xquery.services;
 
-import at.jku.dke.etutor.task_app.dto.ModifyTaskDto;
-import at.jku.dke.etutor.task_app.dto.TaskModificationResponseDto;
+import at.jku.dke.etutor.task_app.dto.*;
 import at.jku.dke.etutor.task_app.services.BaseTaskInGroupService;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskDto;
+import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
+import at.jku.dke.task_app.xquery.evaluation.EvaluationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,14 +22,18 @@ import java.util.List;
 @Service
 public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQueryTaskGroup, ModifyXQueryTaskDto> {
 
+    private final EvaluationService evaluationService;
+
     /**
      * Creates a new instance of class {@link XQueryTaskService}.
      *
      * @param repository          The task repository.
      * @param taskGroupRepository The task group repository.
+     * @param evaluationService   The evaluation service.
      */
-    public XQueryTaskService(XQueryTaskRepository repository, XQueryTaskGroupRepository taskGroupRepository) {
+    public XQueryTaskService(XQueryTaskRepository repository, XQueryTaskGroupRepository taskGroupRepository, EvaluationService evaluationService) {
         super(repository, taskGroupRepository);
+        this.evaluationService = evaluationService;
     }
 
     @Override
@@ -54,6 +59,20 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
         return new TaskModificationResponseDto(null, null);
     }
 
+    @Override
+    protected void afterCreate(XQueryTask task) {
+        var result = this.evaluationService.evaluate(new SubmitSubmissionDto<>("task-admin", "task-create", task.getId(), "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto(task.getSolution())));
+        if (!result.points().equals(result.maxPoints()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, convertGradingDtoToString(result));
+    }
+
+    @Override
+    protected void afterUpdate(XQueryTask task) {
+        var result = this.evaluationService.evaluate(new SubmitSubmissionDto<>("task-admin", "task-update", task.getId(), "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto(task.getSolution())));
+        if (!result.points().equals(result.maxPoints()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, convertGradingDtoToString(result));
+    }
+
     private void setPenaltyProperties(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> modifyTaskDto) {
         task.setMissingNodePenalty(modifyTaskDto.additionalData().missingNodePenalty());
         task.setMissingNodeStrategy(modifyTaskDto.additionalData().missingNodeStrategy());
@@ -73,5 +92,19 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
 
     private static List<String> stringToList(String s) {
         return Arrays.stream(s.split("\n")).map(String::strip).filter(x -> !x.isBlank()).toList();
+    }
+
+    private static String convertGradingDtoToString(GradingDto grading) {
+        var sb = new StringBuilder(grading.generalFeedback());
+        grading.criteria().stream()
+            .filter(c -> !c.passed())
+            .filter(c -> !c.feedback().contains("<style>"))
+            .forEach(c -> {
+                sb.append("\n");
+                sb.append(c.name());
+                sb.append(": ");
+                sb.append(c.feedback());
+            });
+        return sb.toString();
     }
 }

@@ -83,7 +83,7 @@ public class XQueryReport {
             criteria.add(new CriterionDto(
                 this.messageSource.getMessage("criterium.schema", null, locale),
                 null,
-                true,
+                false,
                 this.messageSource.getMessage("criterium.schema.invalid", null, locale)));
         }
 

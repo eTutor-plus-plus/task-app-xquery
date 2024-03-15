@@ -110,7 +110,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("//newSolution", "//newSorting")))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("//db", "//db")))
             // WHEN
             .when()
             .post("/api/task/{id}", this.taskId + 2)
@@ -177,7 +177,7 @@ class TaskControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("//newSolution", "//newSorting")))
+            .body(new ModifyTaskDto<>(this.taskGroupId, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("//db", "//db")))
             // WHEN
             .when()
             .put("/api/task/{id}", this.taskId)

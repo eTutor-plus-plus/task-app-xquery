@@ -1,6 +1,6 @@
 package at.jku.dke.task_app.xquery.evaluation.analysis;
 
-import at.jku.dke.task_app.xquery.evaluation.EvaluationService;
+import at.jku.dke.task_app.xquery.evaluation.EvaluationServiceImpl;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import net.sf.saxon.s9api.*;
@@ -40,7 +40,7 @@ import java.util.function.Function;
  * Analyzes and prepares the evaluation of a submission.
  */
 public class AnalysisImpl implements Analysis {
-    private static final Logger LOG = LoggerFactory.getLogger(EvaluationService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EvaluationServiceImpl.class);
 
     private final XQResult submissionResult;
     private final XQResult solutionResult;
