@@ -101,7 +101,7 @@ public class XQueryReport {
             criteria.add(new CriterionDto(
                 this.messageSource.getMessage("criterium.result", null, locale),
                 null,
-                analysis.isCorrect(),
+                this.mode == SubmissionMode.RUN || analysis.isCorrect(),
                 highlightCode(this.analysis.getSubmissionResult().getRawResult())
             ));
         }
