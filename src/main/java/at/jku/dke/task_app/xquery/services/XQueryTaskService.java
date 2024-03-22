@@ -60,20 +60,20 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
     }
 
     @Override
-    protected void afterCreate(XQueryTask task) {
+    protected void afterCreate(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> dto) {
         var result = this.evaluationService.evaluate(new SubmitSubmissionDto<>("task-admin", "task-create", task.getId(), "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto(task.getSolution())));
         if (!result.points().equals(result.maxPoints()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, convertGradingDtoToString(result));
     }
 
     @Override
-    protected void afterUpdate(XQueryTask task) {
+    protected void afterUpdate(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> dto) {
         var result = this.evaluationService.evaluate(new SubmitSubmissionDto<>("task-admin", "task-update", task.getId(), "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto(task.getSolution())));
         if (!result.points().equals(result.maxPoints()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, convertGradingDtoToString(result));
     }
 
-    private void setPenaltyProperties(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> modifyTaskDto) {
+    private static void setPenaltyProperties(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> modifyTaskDto) {
         task.setMissingNodePenalty(modifyTaskDto.additionalData().missingNodePenalty());
         task.setMissingNodeStrategy(modifyTaskDto.additionalData().missingNodeStrategy());
         task.setSuperfluousNodePenalty(modifyTaskDto.additionalData().superfluousNodePenalty());

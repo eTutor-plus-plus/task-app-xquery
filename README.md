@@ -75,16 +75,16 @@ In production environment, the application requires two database users:
 
 The users must be configured via environment variables. The clients have to be configured via environment variables as well (`X`/`Y` stands for a 0-based index).
 
-| Variable                     | Description                                                      |
-|------------------------------|------------------------------------------------------------------|
-| `SERVER_PORT`                | The server port.                                                 |
-| `SPRING_DATASOURCE_URL`      | JDBC-URL to the database                                         |
-| `SPRING_DATASOURCE_USERNAME` | The username of the JPA user.                                    |
-| `SPRING_DATASOURCE_PASSWORD` | The password of the JPA user.                                    |
-| `SPRING_FLYWAY_USER`         | The username of the database administrator user.                 |
-| `SPRING_FLYWAY_PASSWORD`     | The password of the database administrator user.                 |
-| `CLIENTS_API_KEYS_X_NAME`    | The name of the client.                                          |
-| `CLIENTS_API_KEYS_X_KEY`     | The API key of the client.                                       |
-| `CLIENTS_API_KEYS_X_ROLES_Y` | The role of the client.                                          |
-| `XQUERY_EXECUTOR`            | The executor used to execute XQuery (either `basex` or `saxon`). |
-| `XQUERY_XML_DIRECTORY`       | The directory where the executor stores temporary files.         |
+| Variable                     | Description                                                                                                                                                |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `SERVER_PORT`                | The server port.                                                                                                                                           |
+| `SPRING_DATASOURCE_URL`      | JDBC-URL to the database                                                                                                                                   |
+| `SPRING_DATASOURCE_USERNAME` | The username of the JPA user.                                                                                                                              |
+| `SPRING_DATASOURCE_PASSWORD` | The password of the JPA user.                                                                                                                              |
+| `SPRING_FLYWAY_USER`         | The username of the database administrator user.                                                                                                           |
+| `SPRING_FLYWAY_PASSWORD`     | The password of the database administrator user.                                                                                                           |
+| `CLIENTS_API_KEYS_X_NAME`    | The name of the client.                                                                                                                                    |
+| `CLIENTS_API_KEYS_X_KEY`     | The API key of the client.                                                                                                                                 |
+| `CLIENTS_API_KEYS_X_ROLES_Y` | The role of the client.                                                                                                                                    |
+| `XQUERY_EXECUTOR`            | The executor used to execute XQuery (either `basex` or `saxon`).                                                                                           |
+| `XQUERY_XML_DIRECTORY`       | The directory where the executor stores temporary files. For `basex` this value can be empty; in this case the XQuery databases will be created in memory. |

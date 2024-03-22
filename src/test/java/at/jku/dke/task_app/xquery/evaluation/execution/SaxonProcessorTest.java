@@ -1,14 +1,10 @@
 package at.jku.dke.task_app.xquery.evaluation.execution;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.util.FileSystemUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("resource")
 class SaxonProcessorTest {
@@ -114,6 +110,19 @@ class SaxonProcessorTest {
 
         // Act & Assert
         assertThrows(XQueryException.class, () -> processor.executeQuery(query, document));
+    }
+
+    @Test
+    void getVersion() {
+        // Arrange
+        var processor = new SaxonProcessor(Path.of("./saxon"));
+
+        // Act
+        var result = processor.getVersion();
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.length() > 3);
     }
 
 }

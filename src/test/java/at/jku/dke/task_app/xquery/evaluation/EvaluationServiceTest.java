@@ -8,10 +8,13 @@ import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
 import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
+import at.jku.dke.task_app.xquery.evaluation.execution.BaseXProcessor;
+import org.basex.BaseX;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,9 +29,9 @@ class EvaluationServiceTest {
     void evaluate_invalidLoad() {
         // Arrange
         var taskRepository = mock(XQueryTaskRepository.class);
-        var settings = new XQuerySettings("basex", "./basex");
+        var processor = new BaseXProcessor(Path.of("./basex"));
         var ms = mock(MessageSource.class);
-        var service = new EvaluationServiceImpl(settings, taskRepository, ms);
+        var service = new EvaluationServiceImpl(processor, taskRepository, ms);
 
         var group = new XQueryTaskGroup(1L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
         var task = new XQueryTask(1L, BigDecimal.ONE, TaskStatus.APPROVED, group, "return doc('etutor.xml')/db", null);
@@ -50,9 +53,9 @@ class EvaluationServiceTest {
     void evaluate_invalidSubmissionSyntax() {
         // Arrange
         var taskRepository = mock(XQueryTaskRepository.class);
-        var settings = new XQuerySettings("basex", "./basex");
+        var processor = new BaseXProcessor(Path.of("./basex"));
         var ms = mock(MessageSource.class);
-        var service = new EvaluationServiceImpl(settings, taskRepository, ms);
+        var service = new EvaluationServiceImpl(processor, taskRepository, ms);
 
         var group = new XQueryTaskGroup(1L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
         var task = new XQueryTask(1L, BigDecimal.ONE, TaskStatus.APPROVED, group, "return doc('etutor.xml')/db", null);
@@ -74,9 +77,54 @@ class EvaluationServiceTest {
     void evaluate() {
         // Arrange
         var taskRepository = mock(XQueryTaskRepository.class);
-        var settings = new XQuerySettings("basex", "./basex");
+        var processor = new BaseXProcessor(Path.of("./basex"));
         var ms = mock(MessageSource.class);
-        var service = new EvaluationServiceImpl(settings, taskRepository, ms);
+        var service = new EvaluationServiceImpl(processor, taskRepository, ms);
+
+        var group = new XQueryTaskGroup(3L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
+        var task = new XQueryTask(2L, BigDecimal.ONE, TaskStatus.APPROVED, group, """
+            let $db := doc('etutor.xml')/db,
+                $personen := $db/person, $wohnungen := $db/wohnung,
+                $mietet := $db/mietet
+            return let $ma := $mietet[bis eq '31.12.2099']
+                   let $qms := (for $m in $ma, $w in $wohnungen[@nr eq $m/@wohnnr]
+                                return ($m/preis div $w/gross))
+            return
+             <mietstatistik>
+              <anzahl>{count($ma)}</anzahl>
+              <sum-preis>{sum($ma/preis)}</sum-preis>
+              <qm-preis>{avg($qms)}</qm-preis>
+             </mietstatistik>""", null);
+        when(taskRepository.findByIdWithTaskGroup(2L)).thenReturn(Optional.of(task));
+        when(ms.getMessage(anyString(), any(), any())).thenReturn("unknown");
+
+        // Act
+        var result = service.evaluate(new SubmitSubmissionDto<>(null, null, 2L, "de", SubmissionMode.DIAGNOSE, 3,
+            new XQuerySubmissionDto("""
+                let $db := doc('etutor.xml')/db,
+                    $personen := $db/person, $wohnungen := $db/wohnung,
+                    $mietet := $db/mietet
+                return let $ma := $mietet[bis eq '31.12.2099']
+                       let $qms := (for $m in $ma, $w in $wohnungen[@nr eq $m/@wohnnr]
+                                    return ($m/preis div $w/gross))
+                return
+                 <mietstatistik>
+                  <sum-preis>{sum($ma/preis)}</sum-preis>
+                  <qm-preis>{avg($qms)}</qm-preis>
+                 </mietstatistik>""")));
+
+        // Assert
+        assertEquals(BigDecimal.ZERO, result.points());
+        assertEquals(4, result.criteria().size());
+    }
+
+    @Test
+    void evaluate_inMemory() {
+        // Arrange
+        var taskRepository = mock(XQueryTaskRepository.class);
+        var processor = new BaseXProcessor(null);
+        var ms = mock(MessageSource.class);
+        var service = new EvaluationServiceImpl(processor, taskRepository, ms);
 
         var group = new XQueryTaskGroup(3L, TaskStatus.APPROVED, DIAGNOSE, SUBMIT);
         var task = new XQueryTask(2L, BigDecimal.ONE, TaskStatus.APPROVED, group, """

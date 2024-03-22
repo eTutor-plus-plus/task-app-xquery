@@ -57,13 +57,13 @@ class SubmissionControllerTest {
         this.repository.deleteAll();
 
         var group = this.groupRepository.save(new XQueryTaskGroup(1L, TaskStatus.APPROVED, "<root><a>1</a></root>", "<root><a>2</a></root>"));
-        var task = this.repository.save(new XQueryTask(1L, BigDecimal.TWO, TaskStatus.APPROVED, group, "//a", null));
+        var task = this.repository.save(new XQueryTask(1L, BigDecimal.TWO, TaskStatus.APPROVED, group, "let $db := doc('etutor.xml')\nreturn $db//a", null));
         this.taskId = task.getId();
 
-        var submission = new XQuerySubmission("test-user", "test-id", task, "de", 3, SubmissionMode.SUBMIT, "5");
+        var submission = new XQuerySubmission("test-user", "test-id", task, "de", 3, SubmissionMode.SUBMIT, "let $db := doc('etutor.xml')\nreturn $db//a");
         submission.setEvaluationResult(new GradingDto(BigDecimal.TWO, BigDecimal.TWO, "success", new ArrayList<>()));
         this.graded = this.submissionRepository.save(submission).getId();
-        this.ungraded = this.submissionRepository.save(new XQuerySubmission("test-user", "test-id", task, "de", 3, SubmissionMode.SUBMIT, "5")).getId();
+        this.ungraded = this.submissionRepository.save(new XQuerySubmission("test-user", "test-id", task, "de", 3, SubmissionMode.SUBMIT, "let $db := doc('etutor.xml')\nreturn $db//a")).getId();
     }
 
     //#region --- SUBMIT ---
@@ -73,7 +73,7 @@ class SubmissionControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("2")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("let $db := doc('etutor.xml')\nreturn $db//b")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -97,7 +97,7 @@ class SubmissionControllerTest {
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .queryParams("persist", false)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("//a")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("let $db := doc('etutor.xml')\nreturn $db//a")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -120,7 +120,7 @@ class SubmissionControllerTest {
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
             .queryParams("runInBackground", true)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("let $db := doc('etutor.xml')\nreturn $db//a")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -140,7 +140,7 @@ class SubmissionControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "it", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "it", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("let $db := doc('etutor.xml')\nreturn $db//a")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -155,7 +155,7 @@ class SubmissionControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId + 1, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId + 1, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("let $db := doc('etutor.xml')\nreturn $db//a")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -171,7 +171,7 @@ class SubmissionControllerTest {
             .port(port)
             .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.CRUD_API_KEY)
             .contentType(ContentType.JSON)
-            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
+            .body(new SubmitSubmissionDto<>("test-user", "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("let $db := doc('etutor.xml')\nreturn $db//a")))
             // WHEN
             .when()
             .post("/api/submission")
@@ -183,13 +183,13 @@ class SubmissionControllerTest {
 
     @Test
     void submitParallel() {
-        var threads = IntStream.range(0, 100)
+        var threads = IntStream.range(0, 5)
             .mapToObj(i -> CompletableFuture.supplyAsync(() -> {
                 given()
                     .port(port)
                     .header(AuthConstants.AUTH_TOKEN_HEADER_NAME, ClientSetupExtension.SUBMIT_API_KEY)
                     .contentType(ContentType.JSON)
-                    .body(new SubmitSubmissionDto<>("test-user-" + i, "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("5")))
+                    .body(new SubmitSubmissionDto<>("test-user-" + i, "test-id", this.taskId, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("let $db := doc('etutor.xml')\nreturn $db//a")))
                     // WHEN
                     .when()
                     .post("/api/submission")

@@ -7,7 +7,6 @@ import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskDto;
 import at.jku.dke.task_app.xquery.evaluation.EvaluationServiceImpl;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -45,7 +44,7 @@ class XQueryTaskServiceTest {
         when(evalService.evaluate(any())).thenReturn(new GradingDto(BigDecimal.ZERO, BigDecimal.TEN, "invalid syntax", List.of()));
 
         // Act & Assert
-        assertThrows(ResponseStatusException.class, () -> service.afterCreate(new XQueryTask()));
+        assertThrows(ResponseStatusException.class, () -> service.afterCreate(new XQueryTask(), new ModifyTaskDto<>(3L, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("/person", "//person\n//address/*"))));
     }
 
     @Test
@@ -86,7 +85,7 @@ class XQueryTaskServiceTest {
         when(evalService.evaluate(any())).thenReturn(new GradingDto(BigDecimal.ZERO, BigDecimal.TEN, "", List.of()));
 
         // Act & Assert
-        assertThrows(ResponseStatusException.class, () -> service.afterUpdate(task));
+        assertThrows(ResponseStatusException.class, () -> service.afterUpdate(task, new ModifyTaskDto<>(3L, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("/people", "//person\n//address/*"))));
     }
 
     @Test

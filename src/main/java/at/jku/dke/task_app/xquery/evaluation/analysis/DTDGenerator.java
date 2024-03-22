@@ -91,7 +91,7 @@ class DTDGenerator extends org.xml.sax.helpers.DefaultHandler {
 
     public void run(String filename) {
         try {
-            InputSource is = new InputSource(new File(filename).toURL().toString());
+            InputSource is = new InputSource(new File(filename).toURI().toURL().toString());
             XMLReader parser = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
             parser.setContentHandler(this);
             parser.parse(is);

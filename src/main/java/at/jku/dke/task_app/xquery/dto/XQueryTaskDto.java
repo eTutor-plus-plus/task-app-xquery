@@ -46,17 +46,6 @@ public record XQueryTaskDto(@Schema(example = "return for $b in //bezirke return
                             @NotNull @PositiveOrZero BigDecimal incorrectAttributeValuePenalty,
                             @NotNull GradingStrategy incorrectAttributeValueStrategy) implements Serializable {
     /**
-     * Creates a new instance of {@link XQueryTaskDto}.
-     *
-     * @param solution The solution.
-     * @param sorting  The sorting.
-     */
-    public XQueryTaskDto(@NotNull String solution, String sorting) {
-        this(solution, sorting, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO,
-            GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO, BigDecimal.ZERO, GradingStrategy.KO);
-    }
-
-    /**
      * Creates a new instance of {@link XQueryTaskDto} based on a {@link XQueryTask}.
      *
      * @param task The task.

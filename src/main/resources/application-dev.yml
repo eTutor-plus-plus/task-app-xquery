@@ -37,4 +37,3 @@ clients:
 # XQuery
 xquery:
   executor: basex
-  xml-directory: ./basex
