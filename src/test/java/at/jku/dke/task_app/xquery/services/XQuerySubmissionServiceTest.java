@@ -4,7 +4,7 @@ import at.jku.dke.etutor.task_app.dto.SubmissionMode;
 import at.jku.dke.etutor.task_app.dto.SubmitSubmissionDto;
 import at.jku.dke.task_app.xquery.data.entities.XQuerySubmission;
 import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
-import at.jku.dke.task_app.xquery.evaluation.EvaluationService;
+import at.jku.dke.task_app.xquery.evaluation.EvaluationServiceImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +41,7 @@ class XQuerySubmissionServiceTest {
     @Test
     void evaluate() {
         // Arrange
-        var evalService = mock(EvaluationService.class);
+        var evalService = mock(EvaluationServiceImpl.class);
         var dto = new SubmitSubmissionDto<>("test-user", "test-quiz", 7L, "de", SubmissionMode.SUBMIT, 3, new XQuerySubmissionDto("test-input"));
         var service = new XQuerySubmissionService(null, null, evalService);
 

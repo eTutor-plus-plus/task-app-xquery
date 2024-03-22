@@ -12,6 +12,5 @@ import org.springframework.validation.annotation.Validated;
  */
 @Validated
 @ConfigurationProperties(prefix = "xquery")
-public record XQuerySettings(@NotNull String executor,
-                             @NotNull String xmlDirectory) {
+public record XQuerySettings(@NotNull String executor, String xmlDirectory) {
 }

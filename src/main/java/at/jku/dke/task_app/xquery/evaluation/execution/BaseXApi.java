@@ -2,13 +2,17 @@ package at.jku.dke.task_app.xquery.evaluation.execution;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
+import org.basex.core.MainOptions;
 import org.basex.core.StaticOptions;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Info;
 import org.basex.core.cmd.XQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -20,12 +24,22 @@ class BaseXApi implements AutoCloseable {
 
     /**
      * Creates a new instance of class {@link BaseXApi}.
+     *
+     * @param databasePath The path to the database (if {@code null} the database will be created in main memory).
      */
     public BaseXApi(Path databasePath) {
         LOG.debug("Creating BaseX context with database path: {}", databasePath);
         var options = new StaticOptions(false);
-        options.set(StaticOptions.DBPATH, databasePath.normalize().toAbsolutePath().toString());
+        if (databasePath == null) {
+            try {
+                options.set(StaticOptions.DBPATH, Files.createTempDirectory("etutor").toString());
+            } catch (IOException ignore) {
+            }
+        } else
+            options.set(StaticOptions.DBPATH, databasePath.normalize().toAbsolutePath().toString());
         this.context = new Context(options);
+        if (databasePath == null)
+            this.context.options.set(MainOptions.MAINMEM, true);
     }
 
     /**
@@ -75,6 +89,17 @@ class BaseXApi implements AutoCloseable {
         LOG.debug("Executing query: {}", query);
         XQuery cmd = new XQuery(query);
         return cmd.execute(this.context);
+    }
+
+    /**
+     * Returns information about the database.
+     *
+     * @return The information about the database.
+     * @throws BaseXException If an error occurs during the retrieval of the information.
+     */
+    public String getInfo() throws BaseXException {
+        LOG.debug("Executing info command");
+        return new Info().execute(this.context);
     }
 
     /**

@@ -23,6 +23,14 @@ public interface XQProcessor extends AutoCloseable {
     String executeQuery(String query, String xmlDocument) throws XQueryException;
 
     /**
+     * Returns the version of the XQuery processor.
+     *
+     * @return The version of the XQuery processor.
+     * @throws XQueryException If an error occurs during the retrieval of the version.
+     */
+    String getVersion() throws XQueryException;
+
+    /**
      * Replaces all occurrences of 'etutor.xml' with the given xmlFileName.
      *
      * @param query       The query to evaluate.

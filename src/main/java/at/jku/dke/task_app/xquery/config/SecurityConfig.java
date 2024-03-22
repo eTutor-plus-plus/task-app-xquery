@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class SecurityConfig extends BaseSecurityConfig {
-
     /**
      * Creates a new instance of class {@link SecurityConfig}.
      */

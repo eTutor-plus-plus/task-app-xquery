@@ -61,6 +61,18 @@ public class BaseXProcessor implements XQProcessor {
     }
 
     @Override
+    public String getVersion() throws XQueryException {
+        try {
+            var tmp = this.baseXApi.getInfo();
+            var versionIdx = tmp.indexOf("Version:");
+            var version = tmp.substring(versionIdx + 9, tmp.indexOf("\n", versionIdx));
+            return "BaseX " + version;
+        } catch (BaseXException ex) {
+            throw new XQueryException(ex);
+        }
+    }
+
+    @Override
     public void close() {
         this.baseXApi.close();
     }

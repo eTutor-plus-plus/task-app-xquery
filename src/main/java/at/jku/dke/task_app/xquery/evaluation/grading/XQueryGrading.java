@@ -105,8 +105,6 @@ public class XQueryGrading {
      * @return The calculated minus points.
      */
     private static List<GradingEntry> calculateMinusPoints(Analysis analysis, XQueryTask task) {
-        // TODO: check redundancies
-
         List<GradingEntry> entries = new ArrayList<>();
 
         calculateMinusPoints(GradingEntry.MISSING_NODE, task.getMaxPoints(), task.getMissingNodePenalty(), task.getMissingNodeStrategy(), analysis.getMissingNodes()).ifPresent(entries::add);

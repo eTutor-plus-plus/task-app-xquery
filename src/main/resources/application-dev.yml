@@ -13,6 +13,10 @@ spring:
   jpa:
     show-sql: true
 
+# API docs
+springdoc:
+  show-actuator: true
+
 # API key definition
 clients:
   api-keys:
@@ -33,4 +37,3 @@ clients:
 # XQuery
 xquery:
   executor: basex
-  xml-directory: ./basex

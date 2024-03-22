@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BaseXProcessorTest {
 
@@ -69,6 +69,19 @@ class BaseXProcessorTest {
             // Act & Assert
             assertThrows(XQueryException.class, () -> processor.executeQuery(query, document));
         }
+    }
+
+    @Test
+    void getVersion() throws XQueryException {
+        // Arrange
+        var processor = new BaseXProcessor(Path.of("./basex"));
+
+        // Act
+        var result = processor.getVersion();
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.length() > 3);
     }
 
 }

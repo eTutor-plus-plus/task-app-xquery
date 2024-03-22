@@ -23,6 +23,9 @@ public class SaxonProcessor implements XQProcessor {
      * @param tempPath The path where to store temporary files.
      */
     public SaxonProcessor(Path tempPath) {
+        if (tempPath == null)
+            throw new IllegalArgumentException("tempPath must not be null.");
+
         this.basePath = tempPath.normalize().toAbsolutePath();
         this.compiler = new Processor(false).newXQueryCompiler();
         this.compiler.setBaseURI(this.basePath.toUri());
@@ -75,6 +78,12 @@ public class SaxonProcessor implements XQProcessor {
                 LOG.debug("Error deleting temporary file for XML document.", ex);
             }
         }
+    }
+
+    @Override
+    public String getVersion() {
+        return "Saxon " + this.compiler.getProcessor().getSaxonProductVersion()
+               + " " + this.compiler.getProcessor().getSaxonEdition();
     }
 
     @Override

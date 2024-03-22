@@ -44,7 +44,7 @@ public class XQueryReport {
         this.messageSource = messageSource;
         this.locale = locale;
         this.mode = mode;
-        this.feedbackLevel = feedbackLevel;
+        this.feedbackLevel = mode == SubmissionMode.SUBMIT ? Math.max(1, feedbackLevel) : feedbackLevel;
         this.analysis = analysis;
         this.grading = grading;
     }
@@ -83,7 +83,7 @@ public class XQueryReport {
             criteria.add(new CriterionDto(
                 this.messageSource.getMessage("criterium.schema", null, locale),
                 null,
-                true,
+                false,
                 this.messageSource.getMessage("criterium.schema.invalid", null, locale)));
         }
 
@@ -101,7 +101,7 @@ public class XQueryReport {
             criteria.add(new CriterionDto(
                 this.messageSource.getMessage("criterium.result", null, locale),
                 null,
-                analysis.isCorrect(),
+                this.mode == SubmissionMode.RUN || analysis.isCorrect(),
                 highlightCode(this.analysis.getSubmissionResult().getRawResult())
             ));
         }
@@ -115,35 +115,27 @@ public class XQueryReport {
         if (listSupplier.get().isEmpty())
             return Optional.empty();
 
-        if (this.mode == SubmissionMode.SUBMIT && this.feedbackLevel > 0)
-            return Optional.of(new CriterionDto(
-                this.messageSource.getMessage("criterium." + translationKey, null, locale),
-                this.grading.getDetails(errorCategory).map(e -> e.minusPoints().negate()).orElse(null),
-                false,
-                this.messageSource.getMessage("criterium." + translationKey + ".noCount", null, locale)
-            ));
-
         return switch (this.feedbackLevel) {
             case 0 -> // no feedback
                 Optional.empty();
             case 1 -> // little feedback
                 Optional.of(new CriterionDto(
                     this.messageSource.getMessage("criterium." + translationKey, null, locale),
-                    null,
+                    this.mode == SubmissionMode.SUBMIT ? this.grading.getDetails(errorCategory).map(e -> e.minusPoints().negate()).orElse(null) : null,
                     false,
                     this.messageSource.getMessage("criterium." + translationKey + ".noCount", null, locale)
                 ));
             case 2 -> // some feedback
                 Optional.of(new CriterionDto(
                     this.messageSource.getMessage("criterium." + translationKey, null, locale),
-                    grading.getDetails(errorCategory).map(e -> e.minusPoints().negate()).orElse(null),
+                    this.grading.getDetails(errorCategory).map(e -> e.minusPoints().negate()).orElse(null),
                     false,
                     this.messageSource.getMessage("criterium." + translationKey + ".count", new Object[]{listSupplier.get().size()}, locale)
                 ));
             case 3 -> // much feedback
                 Optional.of(new CriterionDto(
                     this.messageSource.getMessage("criterium." + translationKey, null, locale),
-                    grading.getDetails(errorCategory).map(e -> e.minusPoints().negate()).orElse(null),
+                    this.grading.getDetails(errorCategory).map(e -> e.minusPoints().negate()).orElse(null),
                     false,
                     this.messageSource.getMessage("criterium." + translationKey + ".details", new Object[]{this.createDetailsString(listSupplier.get())}, locale)
                 ));

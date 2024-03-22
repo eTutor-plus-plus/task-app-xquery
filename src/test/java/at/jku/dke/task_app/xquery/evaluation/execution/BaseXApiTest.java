@@ -1,6 +1,7 @@
 package at.jku.dke.task_app.xquery.evaluation.execution;
 
 import org.basex.core.BaseXException;
+import org.basex.core.MainOptions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -11,6 +12,18 @@ import static org.junit.jupiter.api.Assertions.*;
 class BaseXApiTest {
 
     @Test
+    void createInMemory() {
+        try (var basex = new BaseXApi(null)) {
+            // Act
+            var result = basex.getContext();
+
+            // Assert
+            assertNotNull(result);
+            assertTrue(result.options.get(MainOptions.MAINMEM));
+        }
+    }
+
+    @Test
     void getContext() {
         try (var basex = new BaseXApi(Path.of("basex"))) {
             // Act
@@ -18,6 +31,7 @@ class BaseXApiTest {
 
             // Assert
             assertNotNull(result);
+            assertFalse(result.options.get(MainOptions.MAINMEM));
         }
     }
 

@@ -29,7 +29,6 @@ server:
 
 # API docs
 springdoc:
-  #show-actuator: true
   swagger-ui:
     path: /docs
     operations-sorter: alpha
@@ -85,7 +84,3 @@ management:
           - metrics
           - livenessstate
           - readinessstate
-
-# XQuery
-xquery:
-  xmlFilesDirectory: ./xml-documents

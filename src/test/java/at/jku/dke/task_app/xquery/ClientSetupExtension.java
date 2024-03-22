@@ -45,7 +45,10 @@ public class ClientSetupExtension implements BeforeAllCallback {
         System.setProperty("clients.api-keys[2].roles[0]", AuthConstants.READ_SUBMISSION);
 
         System.setProperty("xquery.executor", "basex");
-        System.setProperty("xquery.xml-directory", "./saxon");
+//        System.setProperty("xquery.xml-directory", "./basex");
+        System.setProperty("xquery.xml-directory", "");
+
+        System.setProperty("logging.level.at.jku.dke", "DEBUG");
     }
 
 }

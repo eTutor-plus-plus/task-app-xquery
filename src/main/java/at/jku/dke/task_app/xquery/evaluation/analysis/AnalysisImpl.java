@@ -1,6 +1,6 @@
 package at.jku.dke.task_app.xquery.evaluation.analysis;
 
-import at.jku.dke.task_app.xquery.evaluation.EvaluationService;
+import at.jku.dke.task_app.xquery.evaluation.EvaluationServiceImpl;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import net.sf.saxon.s9api.*;
@@ -40,7 +40,7 @@ import java.util.function.Function;
  * Analyzes and prepares the evaluation of a submission.
  */
 public class AnalysisImpl implements Analysis {
-    private static final Logger LOG = LoggerFactory.getLogger(EvaluationService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EvaluationServiceImpl.class);
 
     private final XQResult submissionResult;
     private final XQResult solutionResult;
@@ -383,7 +383,7 @@ public class AnalysisImpl implements Analysis {
              var solutionReader = new StringReader(this.solutionResult.getResultDocumentRaw());
              var writer = new StringWriter()) {
             Main.diff(submissionReader, solutionReader, writer, new DiffConfig(false, WhiteSpaceProcessing.IGNORE, TextGranularity.TEXT));
-
+//            Files.writeString(java.nio.file.Path.of("diff.xml"), writer.toString()); // write to file for debugging
             return writer.toString();
         } catch (IOException | DiffException ex) {
             LOG.error("Could not generate diff.", ex);
@@ -416,6 +416,7 @@ public class AnalysisImpl implements Analysis {
             transformer.transform(new StreamSource(reader), out);
 
             String result = writer.toString();
+//            Files.writeString(java.nio.file.Path.of("analysis.xml"), writer.toString()); // write to file for debugging
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             return builder.parse(new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
         } catch (IOException | SaxonApiException ex) {
