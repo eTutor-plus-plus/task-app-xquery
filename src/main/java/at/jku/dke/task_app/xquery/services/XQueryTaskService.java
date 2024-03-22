@@ -91,6 +91,8 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
     }
 
     private static List<String> stringToList(String s) {
+        if (s == null)
+            return List.of();
         return Arrays.stream(s.split("\n")).map(String::strip).filter(x -> !x.isBlank()).toList();
     }
 
