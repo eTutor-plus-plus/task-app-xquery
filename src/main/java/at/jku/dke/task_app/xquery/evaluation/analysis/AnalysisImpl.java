@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 /**
  * Analyzes and prepares the evaluation of a submission.
@@ -451,18 +452,61 @@ public class AnalysisImpl implements Analysis {
                 if (submissionList.getLength() != solutionList.getLength())
                     continue; // do not check, something else is wrong, this line should never be reached
 
+                NodeList nList = this.getSubmissionResult().getResultDocument().getElementsByTagName("*");
+                List<Node> nodes = IntStream.range(0, nList.getLength())
+                    .mapToObj(nList::item)
+                    .toList();
+
                 for (int i = 0; i < submissionList.getLength(); i++) {
                     Node submissionNode = submissionList.item(i);
                     Node solutionNode = solutionList.item(i);
 
-                    if (!submissionNode.isEqualNode(solutionNode))
-                        this.displacedNodes.add(new NodeModel(expression, submissionNode.getNodeName()));
+                    if (!submissionNode.isEqualNode(solutionNode)) {
+                        this.displacedNodes.add(new NodeModel(expression, buildXPath(nodes, submissionNode)));
+                    }
                 }
             }
         } catch (XPathExpressionException ex) {
             LOG.error("Could not compile XPath expression.", ex);
             throw new AnalysisException("A fatal error occurred while analyzing the order of the result elements.", ex);
         }
+    }
+
+    private static String buildXPath(List<Node> list, Node xpathNode) {
+        // Find node in original list to create meaningful path expression
+        Node node = list.stream()
+            .filter(x -> x.getNodeName().equals(xpathNode.getNodeName()))
+            .filter(x -> x.getChildNodes().equals(xpathNode.getChildNodes()))
+            .findFirst().orElse(xpathNode);
+        List<String> elements = new ArrayList<>();
+
+        // Build path expression
+        Node parent = node.getParentNode();
+        while (parent != null) {
+            if (parent.getNodeName().equals("xquery-result"))
+                break;
+
+            int precedingSiblings = 1;
+            Node preceding = parent.getPreviousSibling();
+            while (preceding != null) {
+                if (preceding.getNodeType() == Node.ELEMENT_NODE)
+                    precedingSiblings++;
+                preceding = preceding.getPreviousSibling();
+            }
+            elements.add(parent.getNodeName() + '[' + precedingSiblings + ']');
+            parent = parent.getParentNode();
+        }
+
+        int precedingSiblings = 1;
+        Node preceding = node.getPreviousSibling();
+        while (preceding != null) {
+            if (preceding.getNodeType() == Node.ELEMENT_NODE)
+                precedingSiblings++;
+            preceding = preceding.getPreviousSibling();
+        }
+        elements.add(node.getNodeName() + '[' + precedingSiblings + ']');
+
+        return String.join("/", elements);
     }
 
     /**

@@ -47,9 +47,10 @@ public class BaseXProcessor implements XQProcessor {
 
         // Execute query
         try {
+            LOG.info("Executing query: {}", query);
             return this.baseXApi.executeQuery(query);
         } catch (BaseXException ex) {
-            LOG.debug("Could not execute query.", ex);
+            LOG.warn("Could not execute query.", ex);
             throw new XQueryException(ex);
         } finally {
             try {

@@ -3,3 +3,6 @@ contact_links:
   - name: Contribution Details
     url: https://github.com/eTutor-plus-plus/task-app-xquery/blob/main/CONTRIBUTING.md
     about: Before opening a new issue, please make sure to read CONTRIBUTING.md
+  - name: Documentation
+    url: https://github.com/eTutor-plus-plus/task-app-xquery/wiki
+    about: Before opening a new issue, please make sure to read the documentation.

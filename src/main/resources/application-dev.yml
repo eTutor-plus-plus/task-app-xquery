@@ -37,3 +37,4 @@ clients:
 # XQuery
 xquery:
   executor: basex
+  doc-url: http://localhost:8080/api/forwardPublic/xquery/xml/

@@ -30,6 +30,7 @@ docker run -p 8090:8081 \
   -e CLIENTS_API_KEYS_2_KEY=adf455jfil45646 \
   -e CLIENTS_API_KEYS_2_ROLES_0=READ_SUBMISSION \
   -e XQUERY_EXECUTOR=basex
+  -e XQUERY_DOC_URL=https://etutor.dke.uni-linz.ac.at/api/forwardPublic/xquery/xml/
   etutorplusplus/task-app-xquery
 ```
 
@@ -62,6 +63,7 @@ services:
             CLIENTS_API_KEYS_2_KEY: adf455jfil45646
             CLIENTS_API_KEYS_2_ROLES_0: READ_SUBMISSION
             XQUERY_EXECUTOR: basex
+            XQUERY_DOC_URL: https://etutor.dke.uni-linz.ac.at/api/forwardPublic/xquery/xml/
 ```
 
 ### Environment Variables
@@ -88,3 +90,4 @@ The users must be configured via environment variables. The clients have to be c
 | `CLIENTS_API_KEYS_X_ROLES_Y` | The role of the client.                                                                                                                                    |
 | `XQUERY_EXECUTOR`            | The executor used to execute XQuery (either `basex` or `saxon`).                                                                                           |
 | `XQUERY_XML_DIRECTORY`       | The directory where the executor stores temporary files. For `basex` this value can be empty; in this case the XQuery databases will be created in memory. |
+| `XQUERY_DOC_URL`             | The public URL where the XML documents can be viewed. The URL must end with a slash. The ID will be appended by the application.                           |

@@ -2,6 +2,7 @@ package at.jku.dke.task_app.xquery.services;
 
 import at.jku.dke.etutor.task_app.dto.ModifyTaskGroupDto;
 import at.jku.dke.etutor.task_app.dto.TaskStatus;
+import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
 import jakarta.validation.ValidationException;
@@ -23,7 +24,7 @@ class XQueryTaskGroupServiceTest {
     void createTaskGroup() {
         // Arrange
         var dto = new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto("<root><a>1</a></root>", "<root><a>2</a></root>"));
-        var service = new XQueryTaskGroupService(null, null);
+        var service = new XQueryTaskGroupService(null, null, null);
 
         // Act
         var result = service.createTaskGroup(1, dto);
@@ -37,7 +38,7 @@ class XQueryTaskGroupServiceTest {
     void createTaskGroup_invalidType() {
         // Arrange
         var dto = new ModifyTaskGroupDto<>("datalog", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto("<root><a>1</a></root>", "<root><a>2</a></root>"));
-        var service = new XQueryTaskGroupService(null, null);
+        var service = new XQueryTaskGroupService(null, null, null);
 
         // Act & Assert
         assertThrows(ResponseStatusException.class, () -> service.createTaskGroup(1, dto));
@@ -47,7 +48,7 @@ class XQueryTaskGroupServiceTest {
     void createTaskGroup_invalidDiagnoseSyntax() {
         // Arrange
         var dto = new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto("<root><a>1</a><root>", "<root><a>2</a></root>"));
-        var service = new XQueryTaskGroupService(null, null);
+        var service = new XQueryTaskGroupService(null, null, null);
 
         // Act & Assert
         assertThrows(ValidationException.class, () -> service.createTaskGroup(1, dto));
@@ -57,7 +58,7 @@ class XQueryTaskGroupServiceTest {
     void createTaskGroup_invalidSubmitSyntax() {
         // Arrange
         var dto = new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto("<root><a>1</a></root>", "<root></a></root>"));
-        var service = new XQueryTaskGroupService(null, null);
+        var service = new XQueryTaskGroupService(null, null, null);
 
         // Act & Assert
         assertThrows(ValidationException.class, () -> service.createTaskGroup(1, dto));
@@ -69,7 +70,7 @@ class XQueryTaskGroupServiceTest {
     void updateTaskGroup() {
         // Arrange
         var dto = new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto("<root><a>1</a></root>", "<root><a>2</a></root>"));
-        var service = new XQueryTaskGroupService(null, null);
+        var service = new XQueryTaskGroupService(null, null, null);
         var taskGroup = new XQueryTaskGroup("<root><a>3</a></root>", "<root><a>4</a></root>");
 
         // Act
@@ -84,7 +85,7 @@ class XQueryTaskGroupServiceTest {
     void updateTaskGroup_invalidType() {
         // Arrange
         var dto = new ModifyTaskGroupDto<>("datalog", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto("<root><a>1</a></root>", "<root><a>2</a></root>"));
-        var service = new XQueryTaskGroupService(null, null);
+        var service = new XQueryTaskGroupService(null, null, null);
         var taskGroup = new XQueryTaskGroup("diagnose", "submit");
 
         // Act & Assert
@@ -95,7 +96,7 @@ class XQueryTaskGroupServiceTest {
     void updateTaskGroup_invalidDiagnoseSyntax() {
         // Arrange
         var dto = new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto("root><a>1</a></root>", "<root><a>2</a></root>"));
-        var service = new XQueryTaskGroupService(null, null);
+        var service = new XQueryTaskGroupService(null, null, null);
         var taskGroup = new XQueryTaskGroup("diagnose", "submit");
 
         // Act & Assert
@@ -106,7 +107,7 @@ class XQueryTaskGroupServiceTest {
     void updateTaskGroup_invalidSubmitSyntax() {
         // Arrange
         var dto = new ModifyTaskGroupDto<>("xquery", TaskStatus.APPROVED, new ModifyXQueryTaskGroupDto("<root><a>1</a></root>", "<root><a>2/a></root>"));
-        var service = new XQueryTaskGroupService(null, null);
+        var service = new XQueryTaskGroupService(null, null, null);
         var taskGroup = new XQueryTaskGroup("diagnose", "submit");
 
         // Act & Assert
@@ -118,10 +119,11 @@ class XQueryTaskGroupServiceTest {
     void mapToReturnData() {
         // Arrange
         MessageSource ms = mock(MessageSource.class);
-        var service = new XQueryTaskGroupService(null, ms);
+        var service = new XQueryTaskGroupService(null, ms, new XQuerySettings("basex", ".", "https://example.com/xml"));
         var taskGroup = new XQueryTaskGroup("<root><a>1</a></root>", "<root><a>2</a></root>");
         taskGroup.setId(55L);
-        when(ms.getMessage(anyString(), any(), any(Locale.class))).thenAnswer(i -> i.getArgument(1, Object[].class)[1] + ":::" + i.getArgument(1, Object[].class)[0]);
+        when(ms.getMessage(anyString(), any(), any(Locale.class)))
+            .thenAnswer(i -> i.getArgument(1, Object[].class)[2] + ":::" + i.getArgument(1, Object[].class)[0]);
 
         // Act
         var result = service.mapToReturnData(taskGroup, true);
