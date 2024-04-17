@@ -39,7 +39,11 @@
                         <xsl:when test="$currIns and $currDel">
                             <xsl:variable name="otherDel" select="//*[name() = $currNode/name() and ./.. = $currNode/..]/diff:del[text() = $currIns/text()]"/>
                             <xsl:variable name="otherIns" select="//*[name() = $currNode/name() and ./.. = $currNode/..]/diff:ins[text() = $currDel/text()]"/>
-                            <xsl:if test="not($otherDel and $otherIns)">
+                            <xsl:variable name="otherDelSameLevel"
+                                          select="//*[name() = $currNode/name() and count(./preceding-sibling::*) = count($currNode/preceding-sibling::*)]/diff:del[text() = $currIns/text()]"/>
+                            <xsl:variable name="otherInsSameLevel"
+                                          select="//*[name() = $currNode/name() and count(./preceding-sibling::*) = count($currNode/preceding-sibling::*)]/diff:ins[text() = $currDel/text()]"/>
+                            <xsl:if test="not($otherDelSameLevel and $otherInsSameLevel) and not($otherDel and $otherIns)">
                                 <xsl:call-template name="generateXPathElementText"/>
                             </xsl:if>
                         </xsl:when>

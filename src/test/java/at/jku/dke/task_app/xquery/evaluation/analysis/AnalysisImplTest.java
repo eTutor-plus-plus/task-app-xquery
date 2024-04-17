@@ -6,7 +6,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 class AnalysisImplTest {
 
@@ -532,6 +531,227 @@ class AnalysisImplTest {
         assertThat(result)
             .hasSize(2)
             .allMatch(node -> node.getPath().equals("//child") && node.getName().equals("child"));
+    }
+
+    @Test
+    void compare_displacedNodes2() throws AnalysisException {
+        // Arrange
+        var submission = """
+            <xquery-result>
+                <prodInSortiment>
+                                           <ean>0-777-4997-2-43</ean>
+                                           <vkPreis>120</vkPreis>
+                                           <preisRed>30</preisRed>
+                                           <bestand>150</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>0-456-4887-3-22</ean>
+                                           <vkPreis>229</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>130</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>1-626-7767-2-99</ean>
+                                           <vkPreis>420</vkPreis>
+                                           <preisRed>10</preisRed>
+                                           <bestand>100</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>9-396-7510-9-00</ean>
+                                           <vkPreis>13000</vkPreis>
+                                           <preisRed>1000</preisRed>
+                                           <bestand>15</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>5-2671-955-5-55</ean>
+                                           <vkPreis>7000</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>12</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>3-1111-654-3-99</ean>
+                                           <vkPreis>1700</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>7</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>6-231-4777-3-15</ean>
+                                           <vkPreis>500</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>35</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>5-6661-000-0-00</ean>
+                                           <vkPreis>450</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>11</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>0-4381-880-7-00</ean>
+                                           <vkPreis>1250</vkPreis>
+                                           <preisRed>250</preisRed>
+                                           <bestand>85</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>4-1161-730-3-88</ean>
+                                           <vkPreis>500</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>25</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>6-581-1766-3-45</ean>
+                                           <vkPreis>200</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>40</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>1-4444-652-8-88</ean>
+                                           <vkPreis>4500</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>4</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>7-2881-760-3-70</ean>
+                                           <vkPreis>1500</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>23</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>2-446-7240-9-15</ean>
+                                           <vkPreis>22500</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>7</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>1-256-7700-2-00</ean>
+                                           <vkPreis>1999</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>30</bestand>
+                                       </prodInSortiment>
+                       <prodInSortiment>
+                                           <ean>0-55-48567-16-2</ean>
+                                           <vkPreis>300</vkPreis>
+                                           <preisRed>0</preisRed>
+                                           <bestand>100</bestand>
+                                       </prodInSortiment>
+            </xquery-result>
+            """;
+        var solution = """
+            <xquery-result>
+                <prodInSortiment>
+                                    <ean>2-446-7240-9-15</ean>
+                                    <vkPreis>22500</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>7</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>9-396-7510-9-00</ean>
+                                    <vkPreis>13000</vkPreis>
+                                    <preisRed>1000</preisRed>
+                                    <bestand>15</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>5-2671-955-5-55</ean>
+                                    <vkPreis>7000</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>12</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>1-4444-652-8-88</ean>
+                                    <vkPreis>4500</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>4</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>1-256-7700-2-00</ean>
+                                    <vkPreis>1999</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>30</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>3-1111-654-3-99</ean>
+                                    <vkPreis>1700</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>7</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>7-2881-760-3-70</ean>
+                                    <vkPreis>1500</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>23</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>0-4381-880-7-00</ean>
+                                    <vkPreis>1250</vkPreis>
+                                    <preisRed>250</preisRed>
+                                    <bestand>85</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>6-231-4777-3-15</ean>
+                                    <vkPreis>500</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>35</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>4-1161-730-3-88</ean>
+                                    <vkPreis>500</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>25</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>5-6661-000-0-00</ean>
+                                    <vkPreis>450</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>11</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>1-626-7767-2-99</ean>
+                                    <vkPreis>420</vkPreis>
+                                    <preisRed>10</preisRed>
+                                    <bestand>100</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>0-55-48567-16-2</ean>
+                                    <vkPreis>300</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>100</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>0-456-4887-3-22</ean>
+                                    <vkPreis>229</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>130</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>6-581-1766-3-45</ean>
+                                    <vkPreis>200</vkPreis>
+                                    <preisRed>0</preisRed>
+                                    <bestand>40</bestand>
+                                </prodInSortiment>
+                <prodInSortiment>
+                                    <ean>0-777-4997-2-43</ean>
+                                    <vkPreis>120</vkPreis>
+                                    <preisRed>30</preisRed>
+                                    <bestand>150</bestand>
+                                </prodInSortiment>
+            </xquery-result>
+            """;
+        var sorting = List.of("//vkPreis");
+
+        // Act
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
+        var missingNodes = analysis.getMissingNodes();
+        var superfluousNodes = analysis.getSuperfluousNodes();
+        var incorrectTextValues = analysis.getIncorrectTextValues();
+        var result = analysis.getDisplacedNodes();
+
+        // Assert
+        assertEquals(0, missingNodes.size());
+        assertEquals(0, superfluousNodes.size());
+        assertEquals(0, incorrectTextValues.size());
+        assertThat(result)
+            .hasSize(14)
+            .allMatch(node -> node.getPath().equals("//vkPreis"));
     }
 
     @Test
