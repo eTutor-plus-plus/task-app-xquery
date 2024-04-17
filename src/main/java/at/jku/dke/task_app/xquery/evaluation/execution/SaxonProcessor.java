@@ -62,13 +62,13 @@ public class SaxonProcessor implements XQProcessor {
 
         // Execute query
         try {
-            LOG.debug("Executing query {} on document: {}", query, xmlPath);
+            LOG.info("Executing query {} on document: {}", query, xmlPath);
             XQueryExecutable executable = this.compiler.compile(query);
             XQueryEvaluator evaluator = executable.load();
             XdmValue result = evaluator.evaluate(); // internally ensures that the query is not an updating query
             return result.toString();
         } catch (SaxonApiException ex) {
-            LOG.debug("Error during query execution.", ex);
+            LOG.warn("Error during query execution.", ex);
             throw new XQueryException(ex);
         } finally {
             // Clean up
