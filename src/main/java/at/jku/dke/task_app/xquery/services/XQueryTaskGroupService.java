@@ -3,6 +3,7 @@ package at.jku.dke.task_app.xquery.services;
 import at.jku.dke.etutor.task_app.dto.ModifyTaskGroupDto;
 import at.jku.dke.etutor.task_app.dto.TaskGroupModificationResponseDto;
 import at.jku.dke.etutor.task_app.services.BaseTaskGroupService;
+import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
@@ -29,16 +30,19 @@ import java.util.Locale;
 public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup, ModifyXQueryTaskGroupDto> {
 
     private final MessageSource messageSource;
+    private final XQuerySettings settings;
 
     /**
      * Creates a new instance of class {@link XQueryTaskGroupService}.
      *
      * @param repository    The task group repository.
      * @param messageSource The message source.
+     * @param settings      The XQuery settings.
      */
-    public XQueryTaskGroupService(XQueryTaskGroupRepository repository, MessageSource messageSource) {
+    public XQueryTaskGroupService(XQueryTaskGroupRepository repository, MessageSource messageSource, XQuerySettings settings) {
         super(repository);
         this.messageSource = messageSource;
+        this.settings = settings;
     }
 
     @Override
@@ -70,8 +74,18 @@ public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup
     protected TaskGroupModificationResponseDto mapToReturnData(XQueryTaskGroup taskGroup, boolean create) {
         String id = HashIds.encode(taskGroup.getId());
         return new TaskGroupModificationResponseDto(
-            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()), id}, Locale.GERMAN),
-            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()), id}, Locale.ENGLISH));
+            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()), this.settings.docUrl(), id}, Locale.GERMAN),
+            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()), this.settings.docUrl(), id}, Locale.ENGLISH));
+    }
+
+    /**
+     * Returns the public URL of the diagnose document for the specified task group.
+     *
+     * @param id The task group identifier.
+     * @return The public URL.
+     */
+    public String getPublicUrl(long id) {
+        return this.settings.docUrl() + HashIds.encode(id);
     }
 
     /**

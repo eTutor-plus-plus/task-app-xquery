@@ -51,3 +51,4 @@ spring:
 #xquery:
 #  executor: basex
 #  xml-directory: ./basex
+#  doc-url: https://etutor.dke.uni-linz.ac.at/api/forwardPublic/xquery/xml/
