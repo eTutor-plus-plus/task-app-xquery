@@ -114,6 +114,13 @@ public class XQueryReport {
             return Optional.empty();
         if (listSupplier.get().isEmpty())
             return Optional.empty();
+        if (this.mode == SubmissionMode.SUBMIT)
+            return Optional.of(new CriterionDto(
+                this.messageSource.getMessage("criterium." + translationKey, null, locale),
+                this.grading.getDetails(errorCategory).map(e -> e.minusPoints().negate()).orElse(null),
+                false,
+                this.messageSource.getMessage("criterium." + translationKey + ".noCount", null, locale)
+            ));
 
         return switch (this.feedbackLevel) {
             case 0 -> // no feedback
@@ -121,7 +128,7 @@ public class XQueryReport {
             case 1 -> // little feedback
                 Optional.of(new CriterionDto(
                     this.messageSource.getMessage("criterium." + translationKey, null, locale),
-                    this.mode == SubmissionMode.SUBMIT ? this.grading.getDetails(errorCategory).map(e -> e.minusPoints().negate()).orElse(null) : null,
+                    null,
                     false,
                     this.messageSource.getMessage("criterium." + translationKey + ".noCount", null, locale)
                 ));
