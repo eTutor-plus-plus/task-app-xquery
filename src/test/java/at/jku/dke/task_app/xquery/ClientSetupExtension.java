@@ -47,6 +47,7 @@ public class ClientSetupExtension implements BeforeAllCallback {
         System.setProperty("xquery.executor", "basex");
 //        System.setProperty("xquery.xml-directory", "./basex");
         System.setProperty("xquery.xml-directory", "");
+        System.setProperty("xquery.doc-url", "http://localhost:8080/api/forwardPublic/xquery/xml/");
 
         System.setProperty("logging.level.at.jku.dke", "DEBUG");
     }
