@@ -485,7 +485,8 @@ class AnalysisImplTest {
         assertEquals(0, incorrectTextValues.size());
         assertThat(result)
             .hasSize(2)
-            .allMatch(node -> node.getPath().equals("//child2") && node.getName().equals("child2"));
+            .anyMatch(node -> node.getPath().equals("//child2") && node.getName().equals("sub[3]/root[1]/child2[1]"))
+            .anyMatch(node -> node.getPath().equals("//child2") && node.getName().equals("sub[3]/root[1]/child2[2]"));
     }
 
     @Test
@@ -530,7 +531,8 @@ class AnalysisImplTest {
         assertEquals(0, incorrectAttributeValues.size());
         assertThat(result)
             .hasSize(2)
-            .allMatch(node -> node.getPath().equals("//child") && node.getName().equals("child"));
+            .anyMatch(node -> node.getPath().equals("//child") && node.getName().equals("root[1]/child[2]"))
+            .anyMatch(node -> node.getPath().equals("//child") && node.getName().equals("root[1]/child[3]"));
     }
 
     @Test
