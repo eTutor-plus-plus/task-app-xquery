@@ -99,11 +99,15 @@ public class EvaluationServiceImpl implements EvaluationService, AutoCloseable {
                 return new GradingDto(task.getMaxPoints(), points, this.messageSource.getMessage("syntaxError", null, locale), criteria);
             } catch (XQueryException ex) {
                 LOG.warn("Error while executing query", ex);
+                String msg = ex.getMessage();
+                if (msg.contains("BaseXException"))
+                    msg = msg.substring(msg.indexOf(',') + 1);
+
                 criteria.add(new CriterionDto(
                     this.messageSource.getMessage("criterium.syntax", null, locale),
                     null,
                     false,
-                    ex.getMessage()));
+                    msg));
                 return new GradingDto(task.getMaxPoints(), points, this.messageSource.getMessage("syntaxError", null, locale), criteria);
             }
 
