@@ -1,7 +1,5 @@
 package at.jku.dke.task_app.xquery.evaluation.analysis;
 
-import org.w3c.dom.Document;
-
 import java.util.List;
 
 /**
@@ -35,13 +33,6 @@ public interface Analysis {
      * @return {@code true} if the schema is valid; otherwise {@code false}.
      */
     boolean isSchemaValid();
-
-    /**
-     * Returns the diff document.
-     *
-     * @return The document with diff annotations.
-     */
-    Document getDiffDocument();
 
     /**
      * Returns the missing nodes.

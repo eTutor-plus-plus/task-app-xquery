@@ -20,7 +20,7 @@ public class NodeModel {
      * @param name The name of the node.
      */
     public NodeModel(String path, String name) {
-        this.path = path;
+        this.path = path.replaceAll("/xquery-result\\[1\\]", "");
         this.name = name;
     }
 
@@ -39,7 +39,7 @@ public class NodeModel {
      * @param path The path to the parent of the node.
      */
     public void setPath(String path) {
-        this.path = path;
+        this.path = path.replaceAll("/xquery-result\\[1\\]", "");
     }
 
     /**
