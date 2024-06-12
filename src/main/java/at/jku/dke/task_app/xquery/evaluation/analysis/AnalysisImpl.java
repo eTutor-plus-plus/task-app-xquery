@@ -10,10 +10,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
-import org.xmlunit.diff.Comparison;
-import org.xmlunit.diff.DefaultNodeMatcher;
-import org.xmlunit.diff.Diff;
-import org.xmlunit.diff.ElementSelectors;
+import org.xmlunit.diff.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -292,9 +289,11 @@ public class AnalysisImpl implements Analysis {
         Diff docDiff = DiffBuilder.compare(Input.fromDocument(this.solutionResult.getResultDocument()))
             .withTest(Input.fromDocument(this.submissionResult.getResultDocument()))
             .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText, ElementSelectors.byName))
+            .withDifferenceEvaluator(new BruteForceDifferenceEvaluator())
             .ignoreComments()
             .ignoreWhitespace()
             .normalizeWhitespace()
+            .checkForSimilar()
             .build();
         for (var diff : docDiff.getDifferences()) {
             var comparison = diff.getComparison();
@@ -305,16 +304,35 @@ public class AnalysisImpl implements Analysis {
                 case TEXT_VALUE -> this.handleWrongTextValue(submissionDetails, solutionDetails);
                 case CHILD_LOOKUP -> this.handleChildLookup(submissionDetails, solutionDetails);
                 case ATTR_NAME_LOOKUP -> this.handleAttributeLookup(submissionDetails, solutionDetails);
-                default -> {
-                    System.out.println(comparison.getType() + ": " + comparison);
-                }
             }
         }
 
-        // displacedNodes
-        this.displacedNodes = new ArrayList<>();
+        if (!this.incorrectAttributeValues.isEmpty()) { // try again with different matcher, if there are no matches, then only wrong sorting
+            docDiff = DiffBuilder.compare(Input.fromDocument(this.solutionResult.getResultDocument()))
+                .withTest(Input.fromDocument(this.submissionResult.getResultDocument()))
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndAllAttributes, ElementSelectors.byNameAndText, ElementSelectors.byName))
+                .withDifferenceEvaluator(new BruteForceDifferenceEvaluator())
+                .ignoreComments()
+                .ignoreWhitespace()
+                .normalizeWhitespace()
+                .checkForSimilar()
+                .build();
+            boolean found = false;
+            for (var diff : docDiff.getDifferences()) {
+                var comparison = diff.getComparison();
+                if (comparison.getType() == ComparisonType.ATTR_VALUE) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                this.incorrectAttributeValues.clear();
+        }
+
         this.checkSorting();
     }
+
+    //#region --- Difference handlers ---
 
     /**
      * Handles wrong attribute values.
@@ -376,6 +394,9 @@ public class AnalysisImpl implements Analysis {
             this.superfluousAttributes.add(new AttributeModel(submissionDetails.getParentXPath(), submissionDetails.getValue().toString(), submissionDetails.getTarget().getAttributes().getNamedItem(submissionDetails.getValue().toString()).getNodeValue()));
         }
     }
+
+    //#endregion
+
 
     /**
      * Checks the sorting of the result elements.
