@@ -123,7 +123,7 @@ public class EvaluationServiceImpl implements EvaluationService, AutoCloseable {
                 }
             }
         } catch (Exception ex) {
-            LOG.error("Could not close processor for task " + task.getId(), ex);
+            LOG.error("Could not execute query for task " + task.getId(), ex);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not execute query.", ex);
         }
 
@@ -136,6 +136,48 @@ public class EvaluationServiceImpl implements EvaluationService, AutoCloseable {
         } catch (AnalysisException ex) {
             LOG.error("Could not analyze query result for task " + task.getId(), ex);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not analyze query result.", ex);
+        }
+    }
+
+    /**
+     * Executes a query for the specified task.
+     *
+     * @param taskId The task identifier.
+     * @param mode   The execution mode.
+     * @param query  The query to execute.
+     * @return The query result.
+     * @throws EntityNotFoundException If the task does not exist.
+     * @throws RuntimeException        If an error occurs during evaluation.
+     * @throws IllegalStateException   If the executor is not supported.
+     */
+    @Override
+    @Transactional
+    public XQResult execute(long taskId, SubmissionMode mode, String query) {
+        // find task
+        var task = this.taskRepository.findByIdWithTaskGroup(taskId)
+            .orElseThrow(() -> new EntityNotFoundException("Task " + taskId + " does not exist."));
+
+        // prepare
+        LOG.info("Executing query for task {} with mode {}", taskId, mode);
+        String xmlDocument = switch (mode) {
+            case RUN, DIAGNOSE -> task.getTaskGroup().getDiagnoseDocument();
+            case SUBMIT -> task.getTaskGroup().getSubmitDocument();
+        };
+
+        // execute
+        try {
+            try {
+                return new XQResult(this.processor.executeQuery(query, xmlDocument));
+            } catch (InvalidDocumentLoadException ex) {
+                LOG.warn("Error while executing query because of invalid document load", ex);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.messageSource.getMessage("invalidDocument", null, Locale.ENGLISH));
+            } catch (XQueryException ex) {
+                LOG.warn("Error while executing query", ex);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+            }
+        } catch (Exception ex) {
+            LOG.error("Could not execute query for task " + task.getId(), ex);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not execute query.", ex);
         }
     }
 
