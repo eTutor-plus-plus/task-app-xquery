@@ -61,6 +61,16 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
 
     @Override
     protected void afterCreate(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> dto) {
+        // check query does not return empty result
+        var queryResult = this.evaluationService.execute(task.getId(), SubmissionMode.DIAGNOSE, task.getSolution());
+        if (queryResult.getRawResult().isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Query returns empty result for DIAGNOSE document");
+
+        queryResult = this.evaluationService.execute(task.getId(), SubmissionMode.SUBMIT, task.getSolution());
+        if (queryResult.getRawResult().isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Query returns empty result for SUBMIT document");
+
+        // check grading
         var result = this.evaluationService.evaluate(new SubmitSubmissionDto<>("task-admin", "task-create", task.getId(), "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto(task.getSolution())));
         if (!result.points().equals(result.maxPoints()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, convertGradingDtoToString(result));
@@ -68,9 +78,7 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
 
     @Override
     protected void afterUpdate(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> dto) {
-        var result = this.evaluationService.evaluate(new SubmitSubmissionDto<>("task-admin", "task-update", task.getId(), "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto(task.getSolution())));
-        if (!result.points().equals(result.maxPoints()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, convertGradingDtoToString(result));
+        this.afterCreate(task, dto);
     }
 
     private static void setPenaltyProperties(XQueryTask task, ModifyTaskDto<ModifyXQueryTaskDto> modifyTaskDto) {

@@ -20,7 +20,7 @@ public final class IncorrectTextValueModel {
      * @param expectedValue The expected value.
      */
     public IncorrectTextValueModel(String path, String expectedValue) {
-        this.path = path;
+        this.path = path.replaceAll("/xquery-result\\[1\\]", "");
         this.expectedValue = expectedValue;
     }
 
@@ -39,7 +39,7 @@ public final class IncorrectTextValueModel {
      * @param path The path to the node.
      */
     public void setPath(String path) {
-        this.path = path;
+        this.path = path.replaceAll("/xquery-result\\[1\\]", "");
     }
 
     /**

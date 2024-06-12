@@ -22,7 +22,7 @@ public final class IncorrectAttributeValueModel {
      * @param expectedValue The expected value.
      */
     public IncorrectAttributeValueModel(String path, String name, String expectedValue) {
-        this.path = path;
+        this.path = path.replaceAll("/xquery-result\\[1\\]", "");
         this.name = name;
         this.expectedValue = expectedValue;
     }
@@ -42,7 +42,7 @@ public final class IncorrectAttributeValueModel {
      * @param path The path to the node containing the attribute.
      */
     public void setPath(String path) {
-        this.path = path;
+        this.path = path.replaceAll("/xquery-result\\[1\\]", "");
     }
 
     /**

@@ -7,6 +7,7 @@ import at.jku.dke.task_app.xquery.config.XQuerySettings;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTaskGroup;
 import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskGroupRepository;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskGroupDto;
+import at.jku.dke.task_app.xquery.evaluation.analysis.DTDGenerator;
 import jakarta.validation.ValidationException;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Locale;
 
 /**
@@ -73,9 +75,32 @@ public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup
     @Override
     protected TaskGroupModificationResponseDto mapToReturnData(XQueryTaskGroup taskGroup, boolean create) {
         String id = HashIds.encode(taskGroup.getId());
+        String dtd = "";
+
+        try {
+            var file = Files.createTempFile("tg-dtd", ".dtd");
+            Files.writeString(file, taskGroup.getDiagnoseDocument(), StandardCharsets.UTF_8);
+
+            var gen = new DTDGenerator();
+            gen.run(file.toString());
+            dtd = HtmlUtils.htmlEscape(gen.printDTD());
+        } catch (Exception ex) {
+            LOG.error("Could not generate DTD", ex);
+        }
+
         return new TaskGroupModificationResponseDto(
-            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()), this.settings.docUrl(), id}, Locale.GERMAN),
-            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()), this.settings.docUrl(), id}, Locale.ENGLISH));
+            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{
+                HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()),
+                this.settings.docUrl(),
+                id,
+                dtd
+            }, Locale.GERMAN),
+            this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{
+                HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()),
+                this.settings.docUrl(),
+                id,
+                dtd
+            }, Locale.ENGLISH));
     }
 
     /**

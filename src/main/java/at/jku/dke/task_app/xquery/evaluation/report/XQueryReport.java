@@ -44,7 +44,7 @@ public class XQueryReport {
         this.messageSource = messageSource;
         this.locale = locale;
         this.mode = mode;
-        this.feedbackLevel = mode == SubmissionMode.SUBMIT ? Math.max(1, feedbackLevel) : feedbackLevel;
+        this.feedbackLevel = mode == SubmissionMode.SUBMIT ? (feedbackLevel == 0 ? 0 : 1) : feedbackLevel;
         this.analysis = analysis;
         this.grading = grading;
     }
