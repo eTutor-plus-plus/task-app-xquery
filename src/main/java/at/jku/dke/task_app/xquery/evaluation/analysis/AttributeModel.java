@@ -22,7 +22,7 @@ public class AttributeModel {
      * @param value The attribute value.
      */
     public AttributeModel(String path, String name, String value) {
-        this.path = path;
+        this.path = path.replaceAll("/xquery-result\\[1\\]", "");
         this.name = name;
         this.value = value;
     }
@@ -42,7 +42,7 @@ public class AttributeModel {
      * @param path The path to the parent of the node containing the attribute.
      */
     public void setPath(String path) {
-        this.path = path;
+        this.path = path.replaceAll("/xquery-result\\[1\\]", "");
     }
 
     /**

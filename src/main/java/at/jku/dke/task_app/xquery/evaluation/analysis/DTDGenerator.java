@@ -28,7 +28,7 @@ import java.util.*;
  */
 
 @SuppressWarnings("ALL")
-class DTDGenerator extends org.xml.sax.helpers.DefaultHandler {
+public class DTDGenerator extends org.xml.sax.helpers.DefaultHandler {
     // DTDSAXGen is a ContentHandler, created for convenience
     // by extending the default handler that comes with SAX2
 
