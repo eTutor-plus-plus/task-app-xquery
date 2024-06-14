@@ -1,5 +1,6 @@
 package at.jku.dke.task_app.xquery.evaluation.analysis;
 
+import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -117,6 +118,41 @@ class AnalysisImplTest {
 
         // Assert
         assertFalse(result);
+    }
+
+    @Test
+    void compare_invalidNames() throws AnalysisException {
+        // Arrange
+        var submission = """
+            <xquery-result>
+                <root di="1" name="a">
+                    <chlid></chlid>
+                </root>
+            </xquery-result>
+            """;
+        var solution = """
+            <xquery-result>
+                <root id="1" name="a">
+                    <child></child>
+                </root>
+            </xquery-result>
+            """;
+
+        // Act
+        var task = new XQueryTask();
+        task.setSolutionAttributes(List.of("id", "name"));
+        task.setSolutionElements(List.of("root", "child", "xquery-result"));
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), task);
+        var elements = analysis.getInvalidElementNames();
+        var attributes = analysis.getInvalidAttributeNames();
+
+        // Assert
+        assertThat(elements)
+            .hasSize(1)
+            .containsExactly("chlid");
+        assertThat(attributes)
+            .hasSize(1)
+            .containsExactly("di");
     }
 
     @Test
@@ -474,7 +510,7 @@ class AnalysisImplTest {
         var sorting = List.of("//child", "//child2");
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(sorting));
         var missingNodes = analysis.getMissingNodes();
         var superfluousNodes = analysis.getSuperfluousNodes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -521,7 +557,7 @@ class AnalysisImplTest {
             """;
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), List.of());
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(List.of()));
         var missingNodes = analysis.getMissingNodes();
         var superfluousNodes = analysis.getSuperfluousNodes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -566,7 +602,7 @@ class AnalysisImplTest {
         var sorting = List.of("//child2");
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(sorting));
         var missingNodes = analysis.getMissingNodes();
         var superfluousNodes = analysis.getSuperfluousNodes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -613,7 +649,7 @@ class AnalysisImplTest {
             """;
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), List.of());
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(List.of()));
         var missingNodes = analysis.getMissingNodes();
         var superfluousNodes = analysis.getSuperfluousNodes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -686,7 +722,7 @@ class AnalysisImplTest {
         var sorting = List.of("//vkPreis");
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(sorting));
         var missingNodes = analysis.getMissingNodes();
         var superfluousNodes = analysis.getSuperfluousNodes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -760,7 +796,7 @@ class AnalysisImplTest {
             </xquery-result>""";
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), List.of());
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(List.of()));
         var missingNodes = analysis.getMissingNodes();
         var superfluousNodes = analysis.getSuperfluousNodes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -801,7 +837,7 @@ class AnalysisImplTest {
         var sorting = List.of("//child");
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(sorting));
         var missingAttributes = analysis.getMissingAttributes();
         var superfluousAttributes = analysis.getSuperfluousAttributes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -846,7 +882,7 @@ class AnalysisImplTest {
             """;
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), List.of());
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(List.of()));
         var missingAttributes = analysis.getMissingAttributes();
         var superfluousAttributes = analysis.getSuperfluousAttributes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -889,7 +925,7 @@ class AnalysisImplTest {
         var sorting = List.of("//child");
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(sorting));
         var missingAttributes = analysis.getMissingAttributes();
         var superfluousAttributes = analysis.getSuperfluousAttributes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -934,7 +970,7 @@ class AnalysisImplTest {
             """;
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), List.of());
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(List.of()));
         var missingAttributes = analysis.getMissingAttributes();
         var superfluousAttributes = analysis.getSuperfluousAttributes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -978,7 +1014,7 @@ class AnalysisImplTest {
         var sorting = List.of("//child");
 
         // Act
-        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting);
+        var analysis = new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(sorting));
         var missingAttributes = analysis.getMissingAttributes();
         var superfluousAttributes = analysis.getSuperfluousAttributes();
         var incorrectTextValues = analysis.getIncorrectTextValues();
@@ -1022,7 +1058,7 @@ class AnalysisImplTest {
         var sorting = List.of("//child+2");
 
         // Act & Assert
-        assertThrows(AnalysisException.class, () -> new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting));
+        assertThrows(AnalysisException.class, () -> new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(sorting)));
     }
 
     @Test
@@ -1053,6 +1089,6 @@ class AnalysisImplTest {
         var sorting = List.of("//something");
 
         // Act & Assert
-        assertThrows(AnalysisException.class, () -> new AnalysisImpl(new XQResult(submission), new XQResult(solution), sorting));
+        assertThrows(AnalysisException.class, () -> new AnalysisImpl(new XQResult(submission), new XQResult(solution), new XQueryTask(sorting)));
     }
 }

@@ -1,6 +1,10 @@
 package at.jku.dke.task_app.xquery.evaluation.analysis;
 
+import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
 import at.jku.dke.task_app.xquery.evaluation.EvaluationServiceImpl;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -14,6 +18,7 @@ import org.xmlunit.diff.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,6 +36,7 @@ public class AnalysisImpl implements Analysis {
 
     private final XQResult submissionResult;
     private final XQResult solutionResult;
+    private final XQueryTask task;
     private final List<String> sorting;
 
     private boolean schemaValid;
@@ -41,24 +47,27 @@ public class AnalysisImpl implements Analysis {
     private List<AttributeModel> missingAttributes;
     private List<AttributeModel> superfluousAttributes;
     private List<IncorrectAttributeValueModel> incorrectAttributeValues;
+    private List<String> invalidElementNames;
+    private List<String> invalidAttributeNames;
 
     /**
      * Creates a new instance of class {@link AnalysisImpl} and analyzes the results.
      *
      * @param submissionResult The result of the submission.
      * @param solutionResult   The result of the solution.
-     * @param sorting          The XPath expressions to check the sorting of the nodes.
+     * @param task             The task that is checked.
      * @throws NullPointerException If {@code submissionResult} or {@code solutionResult} is {@code null}.
      * @throws AnalysisException    If an error occurs during analysis.
      */
-    public AnalysisImpl(XQResult submissionResult, XQResult solutionResult, List<String> sorting) throws AnalysisException {
+    public AnalysisImpl(XQResult submissionResult, XQResult solutionResult, XQueryTask task) throws AnalysisException {
         Objects.requireNonNull(submissionResult);
         Objects.requireNonNull(solutionResult);
 
         this.submissionResult = submissionResult;
         this.solutionResult = solutionResult;
         this.schemaValid = false;
-        this.sorting = sorting == null ? List.of() : sorting;
+        this.task = task;
+        this.sorting = task == null || task.getSorting() == null ? List.of() : task.getSorting();
         this.validateSortingExpressions();
         this.analyze();
     }
@@ -196,6 +205,25 @@ public class AnalysisImpl implements Analysis {
         return incorrectAttributeValues;
     }
 
+    /**
+     * Returns the list of unrecognized element names (i.e. element names not contained in the solution result).
+     *
+     * @return The invalid element names.
+     */
+    @Override
+    public List<String> getInvalidElementNames() {
+        return this.invalidElementNames;
+    }
+
+    /**
+     * Returns the list of unrecognized attribute names (i.e. attribute names not contained in the solution result).
+     *
+     * @return The invalid attribute names.
+     */
+    @Override
+    public List<String> getInvalidAttributeNames() {
+        return this.invalidAttributeNames;
+    }
     //#endregion
 
     /**
@@ -330,6 +358,32 @@ public class AnalysisImpl implements Analysis {
         }
 
         this.checkSorting();
+
+        // check element/attribute names for run mode
+        if (this.task == null) {
+            this.invalidAttributeNames = List.of();
+            this.invalidElementNames = List.of();
+            return;
+        }
+
+        try {
+            var processor = new Processor(false);
+            var doc = processor.newDocumentBuilder().build(new DOMSource(this.submissionResult.getResultDocument()));
+
+            var xpathResult = processor.newXPathCompiler().evaluate("distinct-values(//*/name())", doc);
+            this.invalidElementNames = xpathResult.stream()
+                .map(XdmItem::getStringValue)
+                .filter(x -> !this.task.getSolutionElements().contains(x))
+                .toList();
+
+            xpathResult = processor.newXPathCompiler().evaluate("distinct-values(//*//@*/name())", doc);
+            this.invalidAttributeNames = xpathResult.stream()
+                .map(XdmItem::getStringValue)
+                .filter(x -> !this.task.getSolutionAttributes().contains(x))
+                .toList();
+        } catch (SaxonApiException ex) {
+            LOG.error("Could not determine elements/attributes in submitted result", ex);
+        }
     }
 
     //#region --- Difference handlers ---
@@ -396,7 +450,6 @@ public class AnalysisImpl implements Analysis {
     }
 
     //#endregion
-
 
     /**
      * Checks the sorting of the result elements.

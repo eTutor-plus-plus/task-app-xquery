@@ -12,6 +12,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -84,6 +85,14 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
     @Column(name = "incorrect_attribute_value_strategy", columnDefinition = "grading_strategy not null")
     private GradingStrategy incorrectAttributeValueStrategy;
 
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "solution_elements", nullable = false)
+    private List<String> solutionElements;
+
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "solution_attributes", nullable = false)
+    private List<String> solutionAttributes;
+
     /**
      * Creates a new instance of class {@link XQueryTask}.
      */
@@ -132,6 +141,26 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
     public XQueryTask(Long id, BigDecimal maxPoints, TaskStatus status, XQueryTaskGroup taskGroup, String solution, List<String> sorting) {
         super(id, maxPoints, status, taskGroup);
         this.solution = solution;
+        this.sorting = sorting;
+        this.setDefaultGradingValues();
+    }
+
+    /**
+     * Creates a new instance of class {@link XQueryTask}.
+     *
+     * @param id The identifier.
+     */
+    public XQueryTask(Long id) {
+        super(id, BigDecimal.ZERO, TaskStatus.DRAFT, null);
+        this.setDefaultGradingValues();
+    }
+
+    /**
+     * Creates a new instance of class {@link XQueryTask}.
+     *
+     * @param sorting The sorting.
+     */
+    public XQueryTask(List<String> sorting) {
         this.sorting = sorting;
         this.setDefaultGradingValues();
     }
@@ -426,7 +455,46 @@ public class XQueryTask extends BaseTaskInGroup<XQueryTaskGroup> {
         this.incorrectAttributeValueStrategy = incorrectAttributeValueStrategy;
     }
 
+    /**
+     * Gets all element names in the solution query result.
+     *
+     * @return The element names.
+     */
+    public List<String> getSolutionElements() {
+        return solutionElements;
+    }
+
+    /**
+     * Sets all element names in the solution query result.
+     *
+     * @param solutionElements The element names.
+     */
+    public void setSolutionElements(List<String> solutionElements) {
+        this.solutionElements = solutionElements;
+    }
+
+    /**
+     * Gets all attribute names in the solution query result.
+     *
+     * @return The attribute names.
+     */
+    public List<String> getSolutionAttributes() {
+        return solutionAttributes;
+    }
+
+    /**
+     * Sets all attribute names in the solution query result.
+     *
+     * @param solutionAttributes The attribute names.
+     */
+    public void setSolutionAttributes(List<String> solutionAttributes) {
+        this.solutionAttributes = solutionAttributes;
+    }
+
     private void setDefaultGradingValues() {
+        this.setSolutionElements(new ArrayList<>());
+        this.setSolutionAttributes(new ArrayList<>());
+
         this.missingNodePenalty = BigDecimal.ZERO;
         this.superfluousNodePenalty = BigDecimal.ZERO;
         this.incorrectTextPenalty = BigDecimal.ZERO;
