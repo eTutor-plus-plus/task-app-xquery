@@ -6,6 +6,8 @@ import at.jku.dke.etutor.task_app.dto.TaskStatus;
 import at.jku.dke.task_app.xquery.data.entities.XQueryTask;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskDto;
 import at.jku.dke.task_app.xquery.evaluation.EvaluationServiceImpl;
+import at.jku.dke.task_app.xquery.evaluation.analysis.AnalysisException;
+import at.jku.dke.task_app.xquery.evaluation.analysis.XQResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -14,6 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,14 +40,16 @@ class XQueryTaskServiceTest {
     }
 
     @Test
-    void afterCreate_invalidSyntax() {
+    void afterCreate_invalidSyntax() throws AnalysisException {
         // Arrange
         var evalService = mock(EvaluationServiceImpl.class);
         var service = new XQueryTaskService(null, null, evalService);
         when(evalService.evaluate(any())).thenReturn(new GradingDto(BigDecimal.ZERO, BigDecimal.TEN, "invalid syntax", List.of()));
+        when(evalService.execute(anyLong(), any(), any())).thenReturn(new XQResult("<doc></doc>"));
 
         // Act & Assert
-        assertThrows(ResponseStatusException.class, () -> service.afterCreate(new XQueryTask(), new ModifyTaskDto<>(3L, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("/person", "//person\n//address/*"))));
+        assertThrows(ResponseStatusException.class, () ->
+            service.afterCreate(new XQueryTask(1L), new ModifyTaskDto<>(3L, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("/person", "//person\n//address/*"))));
     }
 
     @Test
@@ -77,12 +82,14 @@ class XQueryTaskServiceTest {
     }
 
     @Test
-    void afterUpdate_invalidSyntax() {
+    void afterUpdate_invalidSyntax() throws AnalysisException {
         // Arrange
         var evalService = mock(EvaluationServiceImpl.class);
         var service = new XQueryTaskService(null, null, evalService);
         var task = new XQueryTask("/person", null);
+        task.setId(1L);
         when(evalService.evaluate(any())).thenReturn(new GradingDto(BigDecimal.ZERO, BigDecimal.TEN, "", List.of()));
+        when(evalService.execute(anyLong(), any(), any())).thenReturn(new XQResult("<doc></doc>"));
 
         // Act & Assert
         assertThrows(ResponseStatusException.class, () -> service.afterUpdate(task, new ModifyTaskDto<>(3L, BigDecimal.TEN, "xquery", TaskStatus.APPROVED, new ModifyXQueryTaskDto("/people", "//person\n//address/*"))));

@@ -95,6 +95,24 @@ public class XQueryReport {
         this.createCriterion("missingAttribute", GradingEntry.MISSING_ATTRIBUTE, this.analysis::getMissingAttributes).ifPresent(criteria::add);
         this.createCriterion("superfluousAttribute", GradingEntry.SUPERFLUOUS_ATTRIBUTE, this.analysis::getSuperfluousAttributes).ifPresent(criteria::add);
         this.createCriterion("incorrectValue", GradingEntry.INCORRECT_ATTRIBUTE_VALUE, this.analysis::getIncorrectAttributeValues).ifPresent(criteria::add);
+        if (this.mode == SubmissionMode.RUN) {
+            if (!this.analysis.getInvalidElementNames().isEmpty()) {
+                criteria.add(new CriterionDto(
+                    this.messageSource.getMessage("criterium.invalidElementNames", null, locale),
+                    null,
+                    false,
+                    String.join(", ", this.analysis.getInvalidElementNames())
+                ));
+            }
+            if (!this.analysis.getInvalidAttributeNames().isEmpty()) {
+                criteria.add(new CriterionDto(
+                    this.messageSource.getMessage("criterium.invalidAttributeNames", null, locale),
+                    null,
+                    false,
+                    String.join(", ", this.analysis.getInvalidAttributeNames())
+                ));
+            }
+        }
 
         // Query result
         if (this.mode != SubmissionMode.SUBMIT) {

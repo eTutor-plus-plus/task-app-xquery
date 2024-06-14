@@ -9,10 +9,14 @@ import at.jku.dke.task_app.xquery.data.repositories.XQueryTaskRepository;
 import at.jku.dke.task_app.xquery.dto.ModifyXQueryTaskDto;
 import at.jku.dke.task_app.xquery.dto.XQuerySubmissionDto;
 import at.jku.dke.task_app.xquery.evaluation.EvaluationService;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmItem;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.xml.transform.dom.DOMSource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,6 +78,22 @@ public class XQueryTaskService extends BaseTaskInGroupService<XQueryTask, XQuery
         var result = this.evaluationService.evaluate(new SubmitSubmissionDto<>("task-admin", "task-create", task.getId(), "en", SubmissionMode.DIAGNOSE, 3, new XQuerySubmissionDto(task.getSolution())));
         if (!result.points().equals(result.maxPoints()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, convertGradingDtoToString(result));
+
+        // get element and attribute names
+        try {
+            var processor = new Processor(false);
+            var doc = processor.newDocumentBuilder().build(new DOMSource(queryResult.getResultDocument()));
+
+            var xpathResult = processor.newXPathCompiler().evaluate("distinct-values(//*/name())", doc);
+            task.setSolutionElements(xpathResult.stream().map(XdmItem::getStringValue).toList());
+
+            xpathResult = processor.newXPathCompiler().evaluate("distinct-values(//*//@*/name())", doc);
+            task.setSolutionAttributes(xpathResult.stream().map(XdmItem::getStringValue).toList());
+
+            this.repository.save(task);
+        } catch (SaxonApiException ex) {
+            LOG.error("Could not determine elements/attributes in solution result", ex);
+        }
     }
 
     @Override

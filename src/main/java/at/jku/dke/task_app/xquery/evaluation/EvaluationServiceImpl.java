@@ -129,7 +129,7 @@ public class EvaluationServiceImpl implements EvaluationService, AutoCloseable {
 
         // analyze, grade, feedback
         try {
-            var analysis = new AnalysisImpl(new XQResult(submissionResult), new XQResult(solutionResult), task.getSorting());
+            var analysis = new AnalysisImpl(new XQResult(submissionResult), new XQResult(solutionResult), task);
             var grading = new XQueryGrading(task, analysis);
             var report = new XQueryReport(this.messageSource, locale, submission.mode(), submission.feedbackLevel(), analysis, grading);
             return new GradingDto(task.getMaxPoints(), grading.getPoints(), report.getGeneralFeedback(), report.getCriteria());

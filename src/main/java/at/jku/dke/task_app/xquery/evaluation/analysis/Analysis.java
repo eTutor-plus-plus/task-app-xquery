@@ -96,4 +96,18 @@ public interface Analysis {
      * @return The incorrect attribute values.
      */
     List<IncorrectAttributeValueModel> getIncorrectAttributeValues();
+
+    /**
+     * Returns the list of unrecognized element names (i.e. element names not contained in the solution result).
+     *
+     * @return The invalid element names.
+     */
+    List<String> getInvalidElementNames();
+
+    /**
+     * Returns the list of unrecognized attribute names (i.e. attribute names not contained in the solution result).
+     *
+     * @return The invalid attribute names.
+     */
+    List<String> getInvalidAttributeNames();
 }
