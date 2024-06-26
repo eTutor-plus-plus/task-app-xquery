@@ -3,6 +3,7 @@ package at.jku.dke.task_app.xquery.evaluation.report;
 import at.jku.dke.etutor.task_app.dto.CriterionDto;
 import at.jku.dke.etutor.task_app.dto.SubmissionMode;
 import at.jku.dke.task_app.xquery.evaluation.analysis.Analysis;
+import at.jku.dke.task_app.xquery.evaluation.analysis.NodeModel;
 import at.jku.dke.task_app.xquery.evaluation.grading.GradingEntry;
 import at.jku.dke.task_app.xquery.evaluation.grading.XQueryGrading;
 import org.codelibs.jhighlight.renderer.XhtmlRendererFactory;
@@ -90,11 +91,12 @@ public class XQueryReport {
         // Semantics
         this.createCriterion("missingNode", GradingEntry.MISSING_NODE, this.analysis::getMissingNodes).ifPresent(criteria::add);
         this.createCriterion("superfluousNode", GradingEntry.SUPERFLUOUS_NODE, this.analysis::getSuperfluousNodes).ifPresent(criteria::add);
-        this.createCriterion("displacedNode", GradingEntry.DISPLACED_NODE, this.analysis::getDisplacedNodes).ifPresent(criteria::add);
+        this.createCriterion("displacedNode", GradingEntry.DISPLACED_NODE, ()->this.analysis.getDisplacedNodes().stream().map(NodeModel::getName).toList()).ifPresent(criteria::add);
         this.createCriterion("incorrectText", GradingEntry.INCORRECT_TEXT, this.analysis::getIncorrectTextValues).ifPresent(criteria::add);
         this.createCriterion("missingAttribute", GradingEntry.MISSING_ATTRIBUTE, this.analysis::getMissingAttributes).ifPresent(criteria::add);
         this.createCriterion("superfluousAttribute", GradingEntry.SUPERFLUOUS_ATTRIBUTE, this.analysis::getSuperfluousAttributes).ifPresent(criteria::add);
         this.createCriterion("incorrectValue", GradingEntry.INCORRECT_ATTRIBUTE_VALUE, this.analysis::getIncorrectAttributeValues).ifPresent(criteria::add);
+
         if (this.mode == SubmissionMode.RUN) {
             if (!this.analysis.getInvalidElementNames().isEmpty()) {
                 criteria.add(new CriterionDto(
