@@ -90,13 +90,11 @@ public class XQueryTaskGroupService extends BaseTaskGroupService<XQueryTaskGroup
 
         return new TaskGroupModificationResponseDto(
             this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{
-                HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()),
                 this.settings.docUrl(),
                 id,
                 dtd
             }, Locale.GERMAN),
             this.messageSource.getMessage("defaultTaskGroupDescription", new Object[]{
-                HtmlUtils.htmlEscape(taskGroup.getDiagnoseDocument()),
                 this.settings.docUrl(),
                 id,
                 dtd
