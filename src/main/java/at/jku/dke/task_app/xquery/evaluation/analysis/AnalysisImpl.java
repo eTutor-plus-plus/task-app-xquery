@@ -475,7 +475,7 @@ public class AnalysisImpl implements Analysis {
                     Node submissionNode = submissionList.item(i);
                     Node solutionNode = solutionList.item(i);
 
-                    if (!submissionNode.isEqualNode(solutionNode)) {
+                    if (!submissionNode.isEqualNode(solutionNode) && !submissionNode.getNodeName().equals("xquery-result")) {
                         this.displacedNodes.add(new NodeModel(expression, buildXPath(submissionNode)));
                     }
                 }
